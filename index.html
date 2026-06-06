@@ -37,7 +37,7 @@ body{
   box-shadow:0 8px 32px rgba(0,0,0,.3);
 }
 .card.wide{max-width:1100px;text-align:left;padding:28px 28px 20px}
-.lock{font-size:48px;margin-bottom:12px}
+.lock{font-size:52px;margin-bottom:12px;text-shadow:0 0 28px rgba(139,92,246,.55),0 0 10px rgba(206,230,244,.4)}
 h1{font-size:1.4rem;font-weight:600;margin-bottom:6px}
 .sub{color:var(--muted);font-size:.88rem;margin-bottom:28px}
 #gate-sub{white-space:pre-wrap;text-align:center;line-height:1.55}
@@ -206,7 +206,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <!-- LOGIN / GATE -->
 <div id="gate" class="screen">
   <div class="card">
-    <div class="lock">&#128274;</div>
+    <div class="lock">&#127776;</div>
     <h1 id="gate-title">Puerta al Cielo</h1>
     <p class="sub" id="gate-sub">Introduce el código de acceso</p>
     <input type="password" id="code" placeholder="Código" autocomplete="off" autofocus>
@@ -368,7 +368,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <script>
 var GITHUB_API = "https://api.github.com/repos/AndresRomero2001/puerta-al-cielo/contents/data.json";
 var ADMIN_HASH = "d8e02dc389f474320bf6ca93f9ae00fce62e319a52b29e7de04cb0658dda168d";
-var ENC_ADMIN_TOKEN = "2adc8296bc3edbeeca696135a56374c3:4ea017978a3e8714e26b198e:6a763d9ff760aa6124b5d33f76dac2bd:155d0e4304b34f14647bdfa3030d3e9c892501958fd468254807c252c2cf2cbf298e15f7cca6a229";
+var ENC_ADMIN_TOKEN = "956afd06f86c801be213db660f96ad39:2a3ea7d20a5bcb693e904ba4:cd91568d4edc8ec5de03bdb7a5d374c2:cc2134a971d9ee794b897ffd72e392464180a1130565f24d21f6413d2807cd6c06d76a47e45d236f";
 
 var data = null;
 var isAdmin = false;
