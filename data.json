@@ -9,15 +9,5 @@
   "pageDisabled": false,
   "gateTitle": "Puerta al Cielo",
   "gateSub": "Introduce el código de acceso",
-  "logs": [
-    {
-      "ts": "PRUEBA",
-      "tsISO": "test",
-      "type": "login",
-      "detail": "prueba de escritura",
-      "role": "admin",
-      "ip": "0.0.0.0",
-      "fp": "testfp00"
-    }
-  ]
+  "logs": []
 }
