@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Puerta al Cielo</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg1: #0f0c29; --bg2: #302b63; --bg3: #24243e;
+  --card: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.12);
+  --accent: #8b5cf6; --accent-d: #6d28d9;
+  --text: #fff; --muted: rgba(255,255,255,0.55);
+  --err: #f87171; --ok: #34d399;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  min-height:100vh;overflow-x:clip;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+  color:var(--text);
+}
+.screen{
+  width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.card{
+  background:var(--card);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:24px;
+  padding:40px 32px;max-width:420px;width:100%;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+.card.wide{max-width:1100px;text-align:left;padding:28px 28px 20px}
+.lock{font-size:48px;margin-bottom:12px}
+h1{font-size:1.4rem;font-weight:600;margin-bottom:6px}
+.sub{color:var(--muted);font-size:.88rem;margin-bottom:28px}
+#gate-sub{white-space:pre-wrap;text-align:center;line-height:1.55}
+#gate > .card{max-width:600px}
+input[type=password],input[type=text],input[type=number],input[type=datetime-local]{
+  width:100%;padding:14px 18px;border:2px solid rgba(255,255,255,.15);
+  border-radius:14px;background:rgba(255,255,255,.06);color:#fff;
+  font-size:1.05rem;letter-spacing:2px;text-align:center;outline:none;
+  transition:border .3s,box-shadow .3s;margin-bottom:16px;
+}
+input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,246,.15)}
+.btn{
+  width:100%;padding:14px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-d));
+  color:#fff;font-size:1rem;font-weight:600;cursor:pointer;
+  transition:transform .15s,box-shadow .3s;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(139,92,246,.4)}
+.btn:active{transform:translateY(0)}
+.btn-sm{width:auto;padding:10px 20px;font-size:.9rem;border-radius:10px}
+.btn-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+.btn-danger:hover{box-shadow:0 4px 20px rgba(239,68,68,.4)}
+.error{color:var(--err);font-size:.85rem;margin-top:8px;min-height:20px}
+.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fade-in{animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.hidden{display:none!important}
+
+.admin-badge{
+  display:inline-block;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);
+  border-radius:8px;padding:4px 12px;font-size:.8rem;font-weight:600;color:var(--accent);
+}
+.admin-topbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  margin:-28px -28px 18px;padding:14px 28px;
+  background:rgba(14,10,28,0.9);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(139,92,246,.22);
+  border-radius:24px 24px 0 0;
+}
+.admin-topbar .link-btn{font-size:.88rem}
+.tabs{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap}
+.tab{
+  padding:8px 14px;border-radius:10px;border:none;background:rgba(255,255,255,.06);
+  color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:500;transition:.2s;
+}
+.tab:hover{background:rgba(255,255,255,.1);color:#fff}
+.tab.active{background:rgba(139,92,246,.25);color:var(--accent)}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+.field input{text-align:left;letter-spacing:1px;font-size:.95rem}
+.field-row{display:flex;gap:14px;flex-wrap:wrap}
+.field-row .field{flex:1;min-width:160px}
+
+.status{font-size:.85rem;margin-top:10px;min-height:20px}
+.status.ok{color:var(--ok)}
+.status.err{color:var(--err)}
+
+.link-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;text-decoration:underline}
+.link-btn:hover{color:#fff}
+
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.toggle-row label{font-size:.85rem;color:var(--muted)}
+.toggle{position:relative;width:48px;height:26px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.15);border-radius:13px;transition:.3s}
+.toggle .slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--accent)}
+.toggle input:checked+.slider:before{transform:translateX(22px)}
+#page-disabled-toggle:checked+.slider{background:var(--err)!important}
+
+.danger-section{
+  margin-top:20px;padding:14px 16px;background:rgba(248,113,113,.08);
+  border:1px solid rgba(248,113,113,.2);border-radius:14px;
+}
+
+/* Logs table */
+.logs-wrap{max-height:500px;overflow-y:auto;margin-top:12px;border-radius:10px;border:1px solid rgba(255,255,255,.08)}
+.logs-wrap table{width:100%;border-collapse:collapse;font-size:.82rem}
+.logs-wrap th,.logs-wrap td{padding:8px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}
+.logs-wrap th{background:rgba(255,255,255,.05);color:var(--muted);font-weight:600;position:sticky;top:0;backdrop-filter:blur(8px)}
+.logs-wrap tr:last-child td{border-bottom:none}
+.log-chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:600;letter-spacing:.5px}
+.log-chip.login{background:rgba(139,92,246,.2);color:#c4b5fd}
+.log-chip.admin{background:rgba(52,211,153,.2);color:#6ee7b7}
+.log-chip.failed{background:rgba(248,113,113,.2);color:#fca5a5}
+.logs-filter{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.logs-filter button{padding:6px 10px;border-radius:8px;border:none;background:rgba(255,255,255,.06);color:var(--muted);cursor:pointer;font-size:.78rem}
+.logs-filter button.active{background:rgba(139,92,246,.25);color:var(--accent)}
+.logs-filter button:hover{color:#fff}
+.logs-empty{text-align:center;color:var(--muted);padding:30px 20px;font-size:.88rem}
+
+/* ── PUERTA AL CIELO: user view (coordinates + countdown) ── */
+.sky-card{
+  background:var(--card);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:24px;
+  padding:44px 36px;max-width:560px;width:100%;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+.sky-card .title{
+  font-family:'Cinzel',serif;font-size:1.35rem;letter-spacing:4px;
+  text-transform:uppercase;color:rgba(206,230,244,.95);
+  text-shadow:0 0 24px rgba(139,92,246,.45);margin-bottom:6px;
+}
+.sky-card .glyph{font-size:46px;margin-bottom:10px}
+.coords{
+  display:inline-flex;align-items:center;gap:8px;
+  margin:18px 0 6px;padding:12px 20px;
+  background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);
+  border-radius:14px;font-size:1.15rem;font-weight:600;letter-spacing:1px;
+  color:#e9e4ff;
+}
+.coords .pin{font-size:1.2rem;line-height:1}
+.coords-map{display:block;margin-top:2px}
+.coords-map a{color:#a78bfa;font-size:.82rem;text-decoration:none}
+.coords-map a:hover{text-decoration:underline}
+.coords-label{color:var(--muted);font-size:.9rem;margin-bottom:2px}
+
+.countdown-wrap{margin-top:30px}
+.countdown-caption{
+  font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:3px;
+  text-transform:uppercase;color:rgba(180,218,245,.7);margin-bottom:14px;
+}
+.countdown{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.cd-unit{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:14px 10px;min-width:74px;
+}
+.cd-num{
+  font-size:2.1rem;font-weight:700;line-height:1;
+  font-variant-numeric:tabular-nums;color:#fff;
+  text-shadow:0 0 18px rgba(139,92,246,.45);
+}
+.cd-label{margin-top:8px;font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.zero-message{
+  margin-top:26px;padding:16px 20px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(109,40,217,.18));
+  border:1px solid rgba(139,92,246,.4);
+  font-family:'EB Garamond',Georgia,serif;font-size:1.25rem;line-height:1.5;
+  color:#f3efff;animation:fadeIn .6s ease;
+}
+.no-target{margin-top:24px;color:var(--muted);font-size:.92rem;line-height:1.6}
+.user-foot{margin-top:28px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+
+@media(max-width:520px){
+  .card{padding:28px 20px}
+  .card.wide{padding:20px 16px}
+  .sky-card{padding:32px 20px}
+  h1{font-size:1.2rem}
+  .cd-unit{min-width:62px;padding:12px 8px}
+  .cd-num{font-size:1.7rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN / GATE -->
+<div id="gate" class="screen">
+  <div class="card">
+    <div class="lock">&#128274;</div>
+    <h1 id="gate-title">Puerta al Cielo</h1>
+    <p class="sub" id="gate-sub">Introduce el código de acceso</p>
+    <input type="password" id="code" placeholder="Código" autocomplete="off" autofocus>
+    <button class="btn" id="unlock-btn">Entrar</button>
+    <p class="error" id="error"></p>
+  </div>
+</div>
+
+<!-- DISABLED -->
+<div id="disabled-screen" class="screen hidden">
+  <div class="card fade-in">
+    <div class="lock">&#128533;</div>
+    <h1>Página no disponible</h1>
+    <p class="sub" style="margin-bottom:12px">Esta página está pausada por ahora. Puede que vuelva pronto.</p>
+    <button class="btn btn-ghost" style="max-width:200px;margin:0 auto" onclick="location.reload()">Reintentar</button>
+  </div>
+</div>
+
+<!-- USER VIEW (coordinates + countdown) -->
+<div id="user-screen" class="screen hidden">
+  <div class="sky-card fade-in">
+    <div class="glyph">&#10024;</div>
+    <div class="title">Puerta al Cielo</div>
+
+    <div id="user-coords-label" class="coords-label hidden"></div>
+    <div class="coords">
+      <span class="pin">&#128205;</span>
+      <span id="user-coords">—</span>
+    </div>
+    <div class="coords-map"><a id="user-coords-map" href="#" target="_blank" rel="noopener">Ver en el mapa</a></div>
+
+    <div class="countdown-wrap">
+      <div class="countdown-caption">Cuenta atrás</div>
+      <div class="countdown" id="user-countdown">
+        <div class="cd-unit"><div class="cd-num" data-cd="d">00</div><div class="cd-label">Días</div></div>
+        <div class="cd-unit"><div class="cd-num" data-cd="h">00</div><div class="cd-label">Horas</div></div>
+        <div class="cd-unit"><div class="cd-num" data-cd="m">00</div><div class="cd-label">Min</div></div>
+        <div class="cd-unit"><div class="cd-num" data-cd="s">00</div><div class="cd-label">Seg</div></div>
+      </div>
+      <div id="user-no-target" class="no-target hidden">El administrador aún no ha establecido la fecha.</div>
+      <div id="user-zero-message" class="zero-message hidden"></div>
+    </div>
+
+    <div class="user-foot">
+      <button class="link-btn" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen" class="screen hidden">
+  <div class="card wide fade-in">
+    <div class="admin-topbar">
+      <span class="admin-badge">&#128737; Administrador</span>
+      <button class="link-btn" onclick="logout()">Cerrar sesión</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="preview">Vista previa</button>
+      <button class="tab" data-tab="logs">Logs</button>
+      <button class="tab" data-tab="settings">Configuración</button>
+    </div>
+
+    <!-- Panel: preview (what the user sees) -->
+    <div id="panel-preview" class="panel">
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Así verá el usuario la página:</p>
+      <div style="display:flex;justify-content:center">
+        <div class="sky-card" style="max-width:560px">
+          <div class="glyph">&#10024;</div>
+          <div class="title">Puerta al Cielo</div>
+          <div id="admin-coords-label" class="coords-label hidden"></div>
+          <div class="coords">
+            <span class="pin">&#128205;</span>
+            <span id="admin-coords">—</span>
+          </div>
+          <div class="coords-map"><a id="admin-coords-map" href="#" target="_blank" rel="noopener">Ver en el mapa</a></div>
+          <div class="countdown-wrap">
+            <div class="countdown-caption">Cuenta atrás</div>
+            <div class="countdown" id="admin-countdown">
+              <div class="cd-unit"><div class="cd-num" data-cd="d">00</div><div class="cd-label">Días</div></div>
+              <div class="cd-unit"><div class="cd-num" data-cd="h">00</div><div class="cd-label">Horas</div></div>
+              <div class="cd-unit"><div class="cd-num" data-cd="m">00</div><div class="cd-label">Min</div></div>
+              <div class="cd-unit"><div class="cd-num" data-cd="s">00</div><div class="cd-label">Seg</div></div>
+            </div>
+            <div id="admin-no-target" class="no-target hidden">El administrador aún no ha establecido la fecha.</div>
+            <div id="admin-zero-message" class="zero-message hidden"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: logs -->
+    <div id="panel-logs" class="panel hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap">
+        <div class="logs-filter">
+          <button class="logs-filter-btn active" data-filter="all">Todos</button>
+          <button class="logs-filter-btn" data-filter="login">Accesos usuario</button>
+          <button class="logs-filter-btn" data-filter="admin">Accesos admin</button>
+          <button class="logs-filter-btn" data-filter="failed">Fallidos</button>
+        </div>
+        <button class="btn btn-sm btn-ghost" onclick="refreshLogs()">&#128260; Actualizar</button>
+      </div>
+      <div id="logs-wrap" class="logs-wrap"></div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-danger" onclick="clearLogs()">Limpiar logs</button>
+        <span id="logs-status" class="status"></span>
+      </div>
+    </div>
+
+    <!-- Panel: settings -->
+    <div id="panel-settings" class="panel hidden">
+      <div class="field">
+        <label>Código de acceso para el usuario</label>
+        <input type="text" id="user-code-input" placeholder="Código de usuario" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>Etiqueta del lugar (opcional)</label>
+        <input type="text" id="coords-label-input" placeholder="p. ej. El punto de encuentro" autocomplete="off">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Latitud</label>
+          <input type="text" id="latitude-input" placeholder="40.4168" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Longitud</label>
+          <input type="text" id="longitude-input" placeholder="-3.7038" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Fecha y hora objetivo de la cuenta atrás</label>
+        <input type="datetime-local" id="countdown-input">
+        <div style="font-size:.78rem;color:var(--muted);margin-top:-8px">Se interpreta en la hora local del navegador.</div>
+      </div>
+
+      <div class="field">
+        <label>Mensaje al llegar a cero</label>
+        <input type="text" id="zero-message-input" placeholder="Ha llegado el momento." autocomplete="off">
+      </div>
+
+      <div class="toggle-row danger-section">
+        <div>
+          <label style="color:var(--err);font-weight:600">Desactivar página</label>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:4px">El usuario verá un mensaje de no disponible.</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="page-disabled-toggle"><span class="slider"></span></label>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px">
+        <button class="btn btn-sm" onclick="saveSettings()">Guardar configuración</button>
+        <span id="settings-status" class="status"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var GITHUB_API = "__GITHUB_API__";
+var ADMIN_HASH = "__ADMIN_HASH__";
+var ENC_ADMIN_TOKEN = "__ENC_ADMIN_TOKEN__";
+
+var data = null;
+var isAdmin = false;
+var ghToken = null;
+var fileSha = null;
+var countdownTimer = null;
+
+// ── Crypto helpers (browser) ────────────────────────────────────────
+function sha256(str){
+  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str))
+    .then(function(buf){
+      return Array.from(new Uint8Array(buf)).map(function(b){
+        return b.toString(16).padStart(2,"0");
+      }).join("");
+    });
+}
+function hexToBytes(hex){
+  var out = new Uint8Array(hex.length/2);
+  for(var i=0;i<hex.length;i+=2) out[i/2] = parseInt(hex.substr(i,2),16);
+  return out;
+}
+function bytesToHex(bytes){
+  return Array.from(bytes).map(function(b){return b.toString(16).padStart(2,"0");}).join("");
+}
+function deriveKey(password, salt, usages){
+  return crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"])
+    .then(function(km){
+      return crypto.subtle.deriveKey(
+        {name:"PBKDF2", salt:salt, iterations:100000, hash:"SHA-256"},
+        km, {name:"AES-GCM", length:256}, false, usages
+      );
+    });
+}
+function decryptToken(encStr, password){
+  var parts = encStr.split(":");
+  var salt = hexToBytes(parts[0]);
+  var iv   = hexToBytes(parts[1]);
+  var tag  = hexToBytes(parts[2]);
+  var ct   = hexToBytes(parts[3]);
+  return deriveKey(password, salt, ["decrypt"]).then(function(key){
+    var combined = new Uint8Array(ct.length + tag.length);
+    combined.set(ct); combined.set(tag, ct.length);
+    return crypto.subtle.decrypt({name:"AES-GCM", iv:iv}, key, combined);
+  }).then(function(plain){ return new TextDecoder().decode(plain); });
+}
+function encryptToken(token, password){
+  var salt = crypto.getRandomValues(new Uint8Array(16));
+  var iv   = crypto.getRandomValues(new Uint8Array(12));
+  return deriveKey(password, salt, ["encrypt"]).then(function(key){
+    return crypto.subtle.encrypt({name:"AES-GCM", iv:iv}, key, new TextEncoder().encode(token));
+  }).then(function(buf){
+    var all = new Uint8Array(buf);
+    var ct  = all.slice(0, all.length - 16);
+    var tag = all.slice(all.length - 16);
+    return bytesToHex(salt)+":"+bytesToHex(iv)+":"+bytesToHex(tag)+":"+bytesToHex(ct);
+  });
+}
+
+// ── GitHub API ──────────────────────────────────────────────────────
+function nocache(url){return url+(url.indexOf("?")===-1?"?":"&")+"_t="+Date.now();}
+function fetchData(){
+  return fetch(nocache(GITHUB_API), {
+    headers:{"Accept":"application/vnd.github.v3+json"},
+    cache:"no-store"
+  }).then(function(r){return r.json();}).then(function(json){
+    fileSha = json.sha;
+    if(!json.content && json.git_url){
+      return fetch(json.git_url, {headers:{"Accept":"application/vnd.github.v3+json"}})
+        .then(function(r2){return r2.json();})
+        .then(function(blob){
+          var raw = atob(blob.content.replace(/\n/g,""));
+          return JSON.parse(decodeURIComponent(escape(raw)));
+        });
+    }
+    var raw = atob(json.content);
+    return JSON.parse(decodeURIComponent(escape(raw)));
+  });
+}
+function saveData(obj, _retry){
+  if(!ghToken) return Promise.reject(new Error("no-token"));
+  var content = JSON.stringify(obj, null, 2);
+  var encoded = btoa(unescape(encodeURIComponent(content)));
+  return fetch(GITHUB_API, {
+    method:"PUT",
+    headers:{
+      "Authorization":"token "+ghToken,
+      "Accept":"application/vnd.github.v3+json",
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({message:"update data", content:encoded, sha:fileSha})
+  }).then(function(r){return r.json();}).then(function(res){
+    if(res.content && res.content.sha){ fileSha = res.content.sha; return res; }
+    if(!_retry && res.message && res.message.indexOf("does not match")!==-1){
+      return fetch(nocache(GITHUB_API), {
+        headers:{"Authorization":"token "+ghToken,"Accept":"application/vnd.github.v3+json"},
+        cache:"no-store"
+      }).then(function(r2){return r2.json();}).then(function(json){
+        fileSha = json.sha;
+        return saveData(obj, true);
+      });
+    }
+    return res;
+  });
+}
+
+// ── Fingerprint / IP ────────────────────────────────────────────────
+function getFingerprint(){
+  var raw = [
+    navigator.userAgent,
+    screen.width+"x"+screen.height,
+    screen.colorDepth,
+    navigator.language,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    navigator.hardwareConcurrency||"",
+    navigator.platform||""
+  ].join("|");
+  var h = 5381;
+  for(var i=0;i<raw.length;i++){ h = ((h<<5)+h)+raw.charCodeAt(i); h = h & 0xFFFFFFFF; }
+  return (h>>>0).toString(16).padStart(8,"0");
+}
+var cachedIP = null;
+function getIP(){
+  if(cachedIP) return Promise.resolve(cachedIP);
+  return fetch("https://api.ipify.org?format=json")
+    .then(function(r){return r.json();})
+    .then(function(j){ cachedIP = j.ip; return cachedIP; })
+    .catch(function(){ cachedIP = "desconocida"; return cachedIP; });
+}
+
+// ── Logging ─────────────────────────────────────────────────────────
+function madridTimestamp(){
+  return new Date().toLocaleString("es-ES",{timeZone:"Europe/Madrid",hour12:false});
+}
+function appendLog(type, detail){
+  if(!data) return Promise.resolve();
+  if(!data.logs) data.logs = [];
+  return getIP().then(function(ip){
+    data.logs.push({
+      ts: madridTimestamp(),
+      tsISO: new Date().toISOString(),
+      type: type,
+      detail: detail||"",
+      role: isAdmin ? "admin" : "user",
+      ip: ip,
+      fp: getFingerprint()
+    });
+    if(data.logs.length > 500) data.logs = data.logs.slice(-500);
+    return saveData(data).catch(function(e){ console.warn("log save failed",e); });
+  });
+}
+
+// ── Routing ─────────────────────────────────────────────────────────
+function show(id){
+  var ids = ["gate","disabled-screen","user-screen","admin-screen"];
+  ids.forEach(function(x){
+    var el = document.getElementById(x);
+    if(!el) return;
+    if(x===id) el.classList.remove("hidden");
+    else el.classList.add("hidden");
+  });
+}
+
+// ── Unlock ──────────────────────────────────────────────────────────
+function unlock(){
+  var code = document.getElementById("code").value;
+  if(!code) return;
+  var errEl = document.getElementById("error");
+  var btn = document.getElementById("unlock-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Verificando...';
+
+  sha256(code).then(function(hash){
+    if(hash === ADMIN_HASH){
+      isAdmin = true;
+      return decryptToken(ENC_ADMIN_TOKEN, code).then(function(token){
+        ghToken = token;
+        return fetchData();
+      }).then(function(d){
+        data = d;
+        appendLog("login","admin");
+        routeAfterLogin();
+      });
+    }
+    // User path
+    return fetchData().then(function(d){
+      data = d;
+      if(code !== data.userCode){
+        // Log the failed attempt so the admin sees it. We need the user token
+        // to write — decrypt it with the stored userCode (not the typed one).
+        decryptToken(data.encUserToken, data.userCode).then(function(token){
+          ghToken = token;
+          return appendLog("failed","Código incorrecto");
+        }).catch(function(){}).finally(function(){ ghToken = null; });
+        errEl.textContent = "Código incorrecto";
+        errEl.classList.add("shake");
+        document.getElementById("code").value = "";
+        setTimeout(function(){errEl.classList.remove("shake");},500);
+        setTimeout(function(){errEl.textContent="";},2500);
+        return;
+      }
+      // Decrypt user token so the user can write the access log
+      return decryptToken(data.encUserToken, code).then(function(token){
+        ghToken = token;
+        return appendLog("login","user");
+      }).then(function(){
+        routeAfterLogin();
+      });
+    });
+  }).catch(function(e){
+    console.error(e);
+    var msg = "Error de conexión. Inténtalo de nuevo.";
+    if(e && e.message && e.message.indexOf("decrypt")!==-1) msg = "Código incorrecto.";
+    if(e && e.message && e.message.indexOf("NetworkError")!==-1) msg = "Sin conexión.";
+    errEl.textContent = msg;
+    setTimeout(function(){errEl.textContent="";},4000);
+  }).finally(function(){
+    btn.disabled = false;
+    btn.textContent = "Entrar";
+  });
+}
+
+function routeAfterLogin(){
+  if(data.pageDisabled && !isAdmin){
+    show("disabled-screen");
+    return;
+  }
+  if(isAdmin){
+    renderAdmin();
+    show("admin-screen");
+    return;
+  }
+  renderUser();
+  show("user-screen");
+}
+
+// ── Coordinates + countdown rendering ───────────────────────────────
+function formatCoords(){
+  var lat = (data.latitude || "").trim();
+  var lng = (data.longitude || "").trim();
+  if(!lat && !lng) return "—";
+  return lat + ", " + lng;
+}
+function mapsUrl(){
+  var lat = (data.latitude || "").trim();
+  var lng = (data.longitude || "").trim();
+  if(!lat && !lng) return null;
+  return "https://www.google.com/maps?q=" + encodeURIComponent(lat + "," + lng);
+}
+function applyCoords(prefix){
+  var labelEl = document.getElementById(prefix+"-coords-label");
+  var coordsEl = document.getElementById(prefix+"-coords");
+  var mapEl = document.getElementById(prefix+"-coords-map");
+  var label = (data.coordsLabel || "").trim();
+  if(labelEl){
+    if(label){ labelEl.textContent = label; labelEl.classList.remove("hidden"); }
+    else { labelEl.textContent = ""; labelEl.classList.add("hidden"); }
+  }
+  if(coordsEl) coordsEl.textContent = formatCoords();
+  if(mapEl){
+    var url = mapsUrl();
+    if(url){ mapEl.href = url; mapEl.parentNode.classList.remove("hidden"); }
+    else { mapEl.parentNode.classList.add("hidden"); }
+  }
+}
+function parseTarget(){
+  var t = (data.countdownTarget || "").trim();
+  if(!t) return null;
+  var d = new Date(t);
+  if(isNaN(d.getTime())) return null;
+  return d.getTime();
+}
+function pad2(n){ return String(n).padStart(2,"0"); }
+function renderCountdown(prefix){
+  var target = parseTarget();
+  var grid = document.getElementById(prefix+"-countdown");
+  var noTarget = document.getElementById(prefix+"-no-target");
+  var zeroMsg = document.getElementById(prefix+"-zero-message");
+  if(target === null){
+    if(grid) grid.classList.add("hidden");
+    if(zeroMsg) zeroMsg.classList.add("hidden");
+    if(noTarget) noTarget.classList.remove("hidden");
+    setCdValue(prefix, 0, 0, 0, 0);
+    return;
+  }
+  if(noTarget) noTarget.classList.add("hidden");
+  if(grid) grid.classList.remove("hidden");
+  var diff = target - Date.now();
+  if(diff <= 0){
+    setCdValue(prefix, 0, 0, 0, 0);
+    var msg = (data.zeroMessage || "").trim();
+    if(zeroMsg){
+      if(msg){ zeroMsg.textContent = msg; zeroMsg.classList.remove("hidden"); }
+      else zeroMsg.classList.add("hidden");
+    }
+    return;
+  }
+  if(zeroMsg) zeroMsg.classList.add("hidden");
+  var s = Math.floor(diff/1000);
+  var days = Math.floor(s/86400); s -= days*86400;
+  var hours = Math.floor(s/3600); s -= hours*3600;
+  var mins = Math.floor(s/60); s -= mins*60;
+  setCdValue(prefix, days, hours, mins, s);
+}
+function setCdValue(prefix, d, h, m, s){
+  var grid = document.getElementById(prefix+"-countdown");
+  if(!grid) return;
+  var map = {d:d, h:h, m:m, s:s};
+  grid.querySelectorAll("[data-cd]").forEach(function(el){
+    var k = el.getAttribute("data-cd");
+    el.textContent = (k==="d") ? String(map[k]) : pad2(map[k]);
+  });
+}
+function startCountdown(prefix){
+  if(countdownTimer){ clearInterval(countdownTimer); countdownTimer = null; }
+  renderCountdown(prefix);
+  countdownTimer = setInterval(function(){ renderCountdown(prefix); }, 1000);
+}
+function renderUser(){
+  applyCoords("user");
+  startCountdown("user");
+}
+
+// ── Admin rendering ─────────────────────────────────────────────────
+function renderAdmin(){
+  document.getElementById("user-code-input").value = data.userCode || "";
+  document.getElementById("coords-label-input").value = data.coordsLabel || "";
+  document.getElementById("latitude-input").value = data.latitude || "";
+  document.getElementById("longitude-input").value = data.longitude || "";
+  document.getElementById("countdown-input").value = data.countdownTarget || "";
+  document.getElementById("zero-message-input").value = data.zeroMessage || "";
+  document.getElementById("page-disabled-toggle").checked = !!data.pageDisabled;
+  applyCoords("admin");
+  startCountdown("admin");
+  renderLogs();
+}
+
+// ── Status helpers ──────────────────────────────────────────────────
+function statusOk(el){ el.className="status ok"; el.textContent="Guardado"; setTimeout(function(){el.textContent="";},2500); }
+function statusErr(el,msg){ el.className="status err"; el.textContent=msg||"Error"; setTimeout(function(){el.textContent="";},3500); }
+function statusLoading(el){ el.className="status"; el.innerHTML='<span class="spinner"></span>Guardando...'; }
+
+// ── Save settings ───────────────────────────────────────────────────
+function saveSettings(){
+  var st = document.getElementById("settings-status");
+  var newCode = document.getElementById("user-code-input").value.trim();
+  if(!newCode){ statusErr(st,"El código no puede estar vacío"); return; }
+  statusLoading(st);
+  var oldCode = data.userCode;
+  data.userCode = newCode;
+  data.coordsLabel = document.getElementById("coords-label-input").value.trim();
+  data.latitude = document.getElementById("latitude-input").value.trim();
+  data.longitude = document.getElementById("longitude-input").value.trim();
+  data.countdownTarget = document.getElementById("countdown-input").value.trim();
+  data.zeroMessage = document.getElementById("zero-message-input").value.trim();
+  data.pageDisabled = document.getElementById("page-disabled-toggle").checked;
+  // Live-refresh the admin preview
+  applyCoords("admin");
+  startCountdown("admin");
+  var chain;
+  if(newCode !== oldCode){
+    // Re-encrypt the user token with the new code so the user can still log in
+    chain = encryptToken(ghToken, newCode).then(function(enc){ data.encUserToken = enc; });
+  } else {
+    chain = Promise.resolve();
+  }
+  chain.then(function(){ return saveData(data); }).then(function(r){
+    if(r.content) statusOk(st);
+    else statusErr(st, r.message||"Error");
+  }).catch(function(){ statusErr(st,"Sin conexión"); });
+}
+
+// ── Logs ────────────────────────────────────────────────────────────
+var activeLogFilter = "all";
+function refreshLogs(){
+  var st = document.getElementById("logs-status"); statusLoading(st);
+  fetchData().then(function(d){
+    data.logs = d.logs || [];
+    renderLogs();
+    statusOk(st);
+  }).catch(function(){ statusErr(st,"Error al actualizar"); });
+}
+function renderLogs(){
+  var logs = (data.logs || []).slice().reverse();
+  if(activeLogFilter !== "all"){
+    logs = logs.filter(function(l){
+      if(activeLogFilter === "login") return l.type === "login" && l.role !== "admin";
+      if(activeLogFilter === "admin") return l.type === "login" && l.role === "admin";
+      if(activeLogFilter === "failed") return l.type === "failed";
+      return true;
+    });
+  }
+  var wrap = document.getElementById("logs-wrap");
+  if(!logs.length){
+    wrap.innerHTML = '<div class="logs-empty">Sin registros todav&iacute;a.</div>';
+    return;
+  }
+  var rows = logs.map(function(l){
+    var chipClass, chipLabel;
+    if(l.type === "failed"){ chipClass = "failed"; chipLabel = "FALLIDO"; }
+    else if(l.type === "login" && l.role === "admin"){ chipClass = "admin"; chipLabel = "ADMIN"; }
+    else if(l.type === "login"){ chipClass = "login"; chipLabel = "ACCESO"; }
+    else { chipClass = "login"; chipLabel = (l.type||"").toUpperCase(); }
+    return '<tr>'+
+      '<td style="white-space:nowrap;color:var(--muted)">'+escapeHtml(l.ts||"")+'</td>'+
+      '<td><span class="log-chip '+chipClass+'">'+chipLabel+'</span></td>'+
+      '<td>'+escapeHtml(l.detail||"")+'</td>'+
+      '<td style="color:var(--muted);font-size:.76rem">'+escapeHtml(l.ip||"")+'</td>'+
+      '<td style="color:var(--muted);font-size:.76rem;font-family:monospace">'+escapeHtml(l.fp||"")+'</td>'+
+    '</tr>';
+  }).join("");
+  wrap.innerHTML =
+    '<table>'+
+      '<thead><tr><th>Fecha (Madrid)</th><th>Tipo</th><th>Detalle</th><th>IP</th><th>Fingerprint</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table>';
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c];
+  });
+}
+function clearLogs(){
+  if(!confirm("¿Borrar todos los logs?")) return;
+  var st = document.getElementById("logs-status"); statusLoading(st);
+  data.logs = [];
+  saveData(data).then(function(r){
+    if(r.content){ renderLogs(); statusOk(st); }
+    else statusErr(st, r.message||"Error");
+  }).catch(function(){ statusErr(st,"Sin conexión"); });
+}
+
+// ── Tabs ────────────────────────────────────────────────────────────
+document.addEventListener("click", function(e){
+  if(e.target.classList && e.target.classList.contains("logs-filter-btn")){
+    document.querySelectorAll(".logs-filter-btn").forEach(function(b){b.classList.remove("active");});
+    e.target.classList.add("active");
+    activeLogFilter = e.target.getAttribute("data-filter");
+    renderLogs();
+    return;
+  }
+  if(!e.target.classList || !e.target.classList.contains("tab")) return;
+  var name = e.target.getAttribute("data-tab");
+  document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+  e.target.classList.add("active");
+  document.querySelectorAll(".panel").forEach(function(p){p.classList.add("hidden");});
+  var panel = document.getElementById("panel-"+name);
+  if(panel) panel.classList.remove("hidden");
+  if(name==="logs") refreshLogs();
+  if(name==="preview"){ applyCoords("admin"); startCountdown("admin"); }
+});
+
+// ── Logout ──────────────────────────────────────────────────────────
+function logout(){
+  if(countdownTimer){ clearInterval(countdownTimer); countdownTimer = null; }
+  data=null; isAdmin=false; ghToken=null; fileSha=null;
+  document.getElementById("code").value="";
+  document.querySelectorAll(".tab").forEach(function(t,i){t.classList.toggle("active", i===0);});
+  document.querySelectorAll(".panel").forEach(function(p,i){
+    if(i===0) p.classList.remove("hidden"); else p.classList.add("hidden");
+  });
+  show("gate");
+  setTimeout(function(){ document.getElementById("code").focus(); }, 100);
+}
+
+// ── Events ──────────────────────────────────────────────────────────
+document.getElementById("code").addEventListener("keydown", function(e){
+  if(e.key === "Enter") unlock();
+});
+document.getElementById("unlock-btn").addEventListener("click", unlock);
+</script>
+</body>
+</html>
