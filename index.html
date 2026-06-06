@@ -38,6 +38,7 @@ body{
 }
 .card.wide{max-width:1100px;text-align:left;padding:28px 28px 20px}
 .lock{font-size:52px;margin-bottom:12px;text-shadow:0 0 28px rgba(139,92,246,.55),0 0 10px rgba(206,230,244,.4)}
+.gate-star{display:block;margin:0 auto 12px;filter:drop-shadow(0 0 16px rgba(139,92,246,.6)) drop-shadow(0 0 7px rgba(206,230,244,.45))}
 h1{font-size:1.4rem;font-weight:600;margin-bottom:6px}
 .sub{color:var(--muted);font-size:.88rem;margin-bottom:28px}
 #gate-sub{white-space:pre-wrap;text-align:center;line-height:1.55}
@@ -206,7 +207,21 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <!-- LOGIN / GATE -->
 <div id="gate" class="screen">
   <div class="card">
-    <div class="lock">&#127776;</div>
+    <svg class="gate-star" viewBox="0 0 64 64" width="62" height="62" role="img" aria-label="Estrella fugaz">
+      <defs>
+        <linearGradient id="pacSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1a2a63"/><stop offset="1" stop-color="#3b62ad"/>
+        </linearGradient>
+        <linearGradient id="pacStar" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff4b8"/><stop offset="1" stop-color="#f3c233"/>
+        </linearGradient>
+      </defs>
+      <rect x="3" y="3" width="58" height="58" rx="17" fill="url(#pacSky)"/>
+      <path d="M13 52 L34 30" stroke="#e2eefb" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+      <path d="M20 54 L33 39" stroke="#a9d1f1" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+      <path d="M41.00,12.00 L44.17,20.63 L53.36,20.98 L46.14,26.67 L48.64,35.52 L41.00,30.40 L33.36,35.52 L35.86,26.67 L28.64,20.98 L37.83,20.63 Z"
+            fill="url(#pacStar)" stroke="#f7d869" stroke-width="1" stroke-linejoin="round"/>
+    </svg>
     <h1 id="gate-title">Puerta al Cielo</h1>
     <p class="sub" id="gate-sub">Introduce el código de acceso</p>
     <input type="password" id="code" placeholder="Código" autocomplete="off" autofocus>
@@ -368,7 +383,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <script>
 var GITHUB_API = "https://api.github.com/repos/AndresRomero2001/puerta-al-cielo/contents/data.json";
 var ADMIN_HASH = "d8e02dc389f474320bf6ca93f9ae00fce62e319a52b29e7de04cb0658dda168d";
-var ENC_ADMIN_TOKEN = "956afd06f86c801be213db660f96ad39:2a3ea7d20a5bcb693e904ba4:cd91568d4edc8ec5de03bdb7a5d374c2:cc2134a971d9ee794b897ffd72e392464180a1130565f24d21f6413d2807cd6c06d76a47e45d236f";
+var ENC_ADMIN_TOKEN = "96d83bb2e95aaef5dbfca525e3c0bf2a:a98064e3272289c0ae9fd770:ef07094f0ef7ad7de53a8ac2d7e3977d:0c9ab100cd8bed9a1c308117aeca9b6801f93fa5cf93b39b324627246266029fbdd08cb8727fca57";
 
 var data = null;
 var isAdmin = false;
