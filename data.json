@@ -36,6 +36,15 @@
       "role": "user",
       "ip": "88.1.59.66",
       "fp": "eaccbef6"
+    },
+    {
+      "ts": "6/6/2026, 14:07:30",
+      "tsISO": "2026-06-06T12:07:30.115Z",
+      "type": "login",
+      "detail": "user",
+      "role": "user",
+      "ip": "88.1.59.66",
+      "fp": "eaccbef6"
     }
   ]
 }
