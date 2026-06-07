@@ -153,6 +153,15 @@
       "role": "admin",
       "ip": "95.22.145.223",
       "fp": "6d03c6c6"
+    },
+    {
+      "ts": "7/6/2026, 18:27:36",
+      "tsISO": "2026-06-07T16:27:36.288Z",
+      "type": "failed",
+      "detail": "Código incorrecto",
+      "role": "user",
+      "ip": "79.146.41.118",
+      "fp": "a67efcf0"
     }
   ]
 }
