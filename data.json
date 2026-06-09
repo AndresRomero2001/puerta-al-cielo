@@ -6,7 +6,7 @@
   "longitude": "",
   "countdownTarget": "2026-06-19T18:00",
   "zeroMessage": "Paula, ¿me acompañas al cielo?",
-  "pageDisabled": false,
+  "pageDisabled": true,
   "gateTitle": "Puerta al Cielo",
   "gateSub": "Introduce el código de acceso",
   "logs": [
