@@ -324,6 +324,17 @@
       "role": "admin",
       "ip": "84.78.244.18",
       "fp": "97a23a32"
+    },
+    {
+      "ts": "PRUEBA",
+      "tsISO": "t",
+      "type": "answer",
+      "detail": "Reserva 20-21: SÍ",
+      "role": "user",
+      "ip": "0.0.0.0",
+      "fp": "testfp00"
     }
-  ]
+  ],
+  "reservaAnswer": "si",
+  "reservaAnsweredAt": "PRUEBA"
 }
