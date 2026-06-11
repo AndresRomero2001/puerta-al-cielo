@@ -405,8 +405,17 @@
       "role": "admin",
       "ip": "84.78.244.18",
       "fp": "8f8d17f0"
+    },
+    {
+      "ts": "12/6/2026, 0:31:13",
+      "tsISO": "2026-06-11T22:31:13.238Z",
+      "type": "answer",
+      "detail": "Respuesta reiniciada por el administrador",
+      "role": "admin",
+      "ip": "84.78.244.18",
+      "fp": "8f8d17f0"
     }
   ],
-  "reservaAnswer": "no",
-  "reservaAnsweredAt": "12/6/2026, 0:25:44"
+  "reservaAnswer": "",
+  "reservaAnsweredAt": ""
 }
