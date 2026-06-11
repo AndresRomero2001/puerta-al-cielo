@@ -404,6 +404,15 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
         <input type="text" id="zero-message-input" placeholder="Ha llegado el momento." autocomplete="off">
       </div>
 
+      <div style="padding:14px 16px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:14px;margin-bottom:16px">
+        <label style="color:#c4b5fd;font-weight:600;display:block;margin-bottom:4px">Respuesta de reserva del usuario</label>
+        <div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Respuesta actual: <strong id="reserva-current">—</strong></div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-ghost" onclick="resetReserva()">Reiniciar respuesta (sin selección)</button>
+          <span id="reserva-reset-status" class="status"></span>
+        </div>
+      </div>
+
       <div class="toggle-row danger-section">
         <div>
           <label style="color:var(--err);font-weight:600">Desactivar página</label>
@@ -424,7 +433,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <script>
 var GITHUB_API = "https://api.github.com/repos/AndresRomero2001/puerta-al-cielo/contents/data.json";
 var ADMIN_HASH = "d8e02dc389f474320bf6ca93f9ae00fce62e319a52b29e7de04cb0658dda168d";
-var ENC_ADMIN_TOKEN = "7a2b58242e697b21741e47532b0d034c:9af1ae55fe3f3913ba63aeb3:c43375a23b44f64752ddd2529b2146dc:e20605fc0a0f7503f2aad16bee11499a6678dbed62f5626a2166fa6c56e7c4df366824a558850388";
+var ENC_ADMIN_TOKEN = "e6a22af91e20a58bca265d48bf982b1b:f48ea8f65e077b37fbfa07e7:00b5bdabeda32f68da148d19d4bd6102:21f417ad790fb0931dfcc9a219902466746e6f77c82b01d4b6d6f68f42a71eed31f2dcfc7170bb60";
 
 var data = null;
 var isAdmin = false;
@@ -763,6 +772,34 @@ function highlightReserva(prefix, ans){
 function applyReserva(prefix){
   highlightReserva(prefix, data && data.reservaAnswer);
 }
+function reservaLabel(ans){
+  return ans === "si" ? "Sí" : (ans === "no" ? "No" : "Sin responder");
+}
+// Admin action: clear the user's choice so neither button is selected.
+function resetReserva(){
+  if(!confirm("¿Reiniciar la respuesta del usuario? Quedará sin ninguna opción seleccionada.")) return;
+  var st = document.getElementById("reserva-reset-status"); statusLoading(st);
+  data.reservaAnswer = "";
+  data.reservaAnsweredAt = "";
+  if(!data.logs) data.logs = [];
+  getIP().then(function(ip){
+    data.logs.push({
+      ts: madridTimestamp(), tsISO: new Date().toISOString(), type: "answer",
+      detail: "Respuesta reiniciada por el administrador",
+      role: "admin", ip: ip, fp: getFingerprint()
+    });
+    if(data.logs.length > 500) data.logs = data.logs.slice(-500);
+    return saveData(data);
+  }).then(function(r){
+    if(r && r.content){
+      statusOk(st);
+      applyReserva("admin");
+      var cur = document.getElementById("reserva-current");
+      if(cur) cur.textContent = reservaLabel(data.reservaAnswer);
+      renderLogs();
+    } else statusErr(st, r.message || "Error");
+  }).catch(function(){ statusErr(st, "Sin conexión"); });
+}
 function answerReserva(prefix, ans){
   // Mark the chosen button immediately (keep both buttons on screen).
   highlightReserva(prefix, ans);
@@ -803,6 +840,8 @@ function renderAdmin(){
   document.getElementById("page-disabled-toggle").checked = !!data.pageDisabled;
   applyCoords("admin");
   applyReserva("admin");
+  var rc = document.getElementById("reserva-current");
+  if(rc) rc.textContent = reservaLabel(data.reservaAnswer);
   startCountdown("admin");
   renderLogs();
 }

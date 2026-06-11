@@ -404,6 +404,15 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
         <input type="text" id="zero-message-input" placeholder="Ha llegado el momento." autocomplete="off">
       </div>
 
+      <div style="padding:14px 16px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:14px;margin-bottom:16px">
+        <label style="color:#c4b5fd;font-weight:600;display:block;margin-bottom:4px">Respuesta de reserva del usuario</label>
+        <div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Respuesta actual: <strong id="reserva-current">—</strong></div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-ghost" onclick="resetReserva()">Reiniciar respuesta (sin selección)</button>
+          <span id="reserva-reset-status" class="status"></span>
+        </div>
+      </div>
+
       <div class="toggle-row danger-section">
         <div>
           <label style="color:var(--err);font-weight:600">Desactivar página</label>
@@ -763,6 +772,34 @@ function highlightReserva(prefix, ans){
 function applyReserva(prefix){
   highlightReserva(prefix, data && data.reservaAnswer);
 }
+function reservaLabel(ans){
+  return ans === "si" ? "Sí" : (ans === "no" ? "No" : "Sin responder");
+}
+// Admin action: clear the user's choice so neither button is selected.
+function resetReserva(){
+  if(!confirm("¿Reiniciar la respuesta del usuario? Quedará sin ninguna opción seleccionada.")) return;
+  var st = document.getElementById("reserva-reset-status"); statusLoading(st);
+  data.reservaAnswer = "";
+  data.reservaAnsweredAt = "";
+  if(!data.logs) data.logs = [];
+  getIP().then(function(ip){
+    data.logs.push({
+      ts: madridTimestamp(), tsISO: new Date().toISOString(), type: "answer",
+      detail: "Respuesta reiniciada por el administrador",
+      role: "admin", ip: ip, fp: getFingerprint()
+    });
+    if(data.logs.length > 500) data.logs = data.logs.slice(-500);
+    return saveData(data);
+  }).then(function(r){
+    if(r && r.content){
+      statusOk(st);
+      applyReserva("admin");
+      var cur = document.getElementById("reserva-current");
+      if(cur) cur.textContent = reservaLabel(data.reservaAnswer);
+      renderLogs();
+    } else statusErr(st, r.message || "Error");
+  }).catch(function(){ statusErr(st, "Sin conexión"); });
+}
 function answerReserva(prefix, ans){
   // Mark the chosen button immediately (keep both buttons on screen).
   highlightReserva(prefix, ans);
@@ -803,6 +840,8 @@ function renderAdmin(){
   document.getElementById("page-disabled-toggle").checked = !!data.pageDisabled;
   applyCoords("admin");
   applyReserva("admin");
+  var rc = document.getElementById("reserva-current");
+  if(rc) rc.textContent = reservaLabel(data.reservaAnswer);
   startCountdown("admin");
   renderLogs();
 }
