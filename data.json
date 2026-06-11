@@ -353,15 +353,15 @@
       "fp": "97a23a32"
     },
     {
-      "ts": "12/6/2026, 0:24:57",
-      "tsISO": "2026-06-11T22:24:57.465Z",
-      "type": "login",
-      "detail": "admin",
-      "role": "admin",
+      "ts": "12/6/2026, 0:25:11",
+      "tsISO": "2026-06-11T22:25:11.886Z",
+      "type": "answer",
+      "detail": "Reserva 20-21: NO",
+      "role": "user",
       "ip": "84.78.244.18",
-      "fp": "8f8d17f0"
+      "fp": "97a23a32"
     }
   ],
-  "reservaAnswer": "si",
-  "reservaAnsweredAt": "12/6/2026, 0:24:28"
+  "reservaAnswer": "no",
+  "reservaAnsweredAt": "12/6/2026, 0:25:11"
 }
