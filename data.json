@@ -360,8 +360,17 @@
       "role": "user",
       "ip": "84.78.244.18",
       "fp": "97a23a32"
+    },
+    {
+      "ts": "12/6/2026, 0:25:42",
+      "tsISO": "2026-06-11T22:25:42.772Z",
+      "type": "answer",
+      "detail": "Reserva 20-21: NO",
+      "role": "user",
+      "ip": "84.78.244.18",
+      "fp": "97a23a32"
     }
   ],
   "reservaAnswer": "no",
-  "reservaAnsweredAt": "12/6/2026, 0:25:11"
+  "reservaAnsweredAt": "12/6/2026, 0:25:42"
 }
