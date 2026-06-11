@@ -134,6 +134,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 .log-chip.login{background:rgba(139,92,246,.2);color:#c4b5fd}
 .log-chip.admin{background:rgba(52,211,153,.2);color:#6ee7b7}
 .log-chip.failed{background:rgba(248,113,113,.2);color:#fca5a5}
+.log-chip.answer{background:rgba(251,191,36,.22);color:#fcd34d}
 .logs-filter{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 .logs-filter button{padding:6px 10px;border-radius:8px;border:none;background:rgba(255,255,255,.06);color:var(--muted);cursor:pointer;font-size:.78rem}
 .logs-filter button.active{background:rgba(139,92,246,.25);color:var(--accent)}
@@ -165,6 +166,23 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 .coords-map a{color:#a78bfa;font-size:.82rem;text-decoration:none}
 .coords-map a:hover{text-decoration:underline}
 .coords-label{color:var(--muted);font-size:.9rem;margin-bottom:2px}
+
+/* RSVP / reserva question (between coordinates and countdown) */
+.reserva{margin:30px auto 6px;max-width:440px}
+.reserva-q{
+  font-family:'EB Garamond','Cormorant Garamond',Georgia,serif;
+  font-size:1.28rem;line-height:1.45;color:#efeaff;margin-bottom:18px;
+  text-shadow:0 1px 10px rgba(139,92,246,.25);
+}
+.reserva-btns{display:flex;gap:12px;justify-content:center}
+.reserva-btns .btn{width:auto;min-width:118px;padding:12px 30px}
+.reserva-done{
+  font-family:'EB Garamond','Cormorant Garamond',Georgia,serif;
+  font-size:1.18rem;line-height:1.45;color:#e8f3fb;
+  padding:13px 20px;border-radius:16px;display:inline-block;
+  background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(109,40,217,.16));
+  border:1px solid rgba(139,92,246,.4);animation:fadeIn .5s ease;
+}
 
 .countdown-wrap{margin-top:30px}
 .countdown-caption{
@@ -253,6 +271,15 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
     </div>
     <div class="coords-map"><a id="user-coords-map" href="#" target="_blank" rel="noopener">Ver en el mapa</a></div>
 
+    <div class="reserva">
+      <p class="reserva-q">¿Quieres reservarte los días 20 y 21?</p>
+      <div class="reserva-btns" id="user-reserva-btns">
+        <button class="btn" onclick="answerReserva('user','si')">Sí</button>
+        <button class="btn btn-ghost" onclick="answerReserva('user','no')">No</button>
+      </div>
+      <div class="reserva-done hidden" id="user-reserva-done"></div>
+    </div>
+
     <div class="countdown-wrap">
       <div class="countdown-caption">Cuenta atrás</div>
       <div class="countdown" id="user-countdown">
@@ -297,6 +324,14 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
             <span id="admin-coords">—</span>
           </div>
           <div class="coords-map"><a id="admin-coords-map" href="#" target="_blank" rel="noopener">Ver en el mapa</a></div>
+          <div class="reserva">
+            <p class="reserva-q">¿Quieres reservarte los días 20 y 21?</p>
+            <div class="reserva-btns" id="admin-reserva-btns">
+              <button class="btn" onclick="answerReserva('admin','si')">Sí</button>
+              <button class="btn btn-ghost" onclick="answerReserva('admin','no')">No</button>
+            </div>
+            <div class="reserva-done hidden" id="admin-reserva-done"></div>
+          </div>
           <div class="countdown-wrap">
             <div class="countdown-caption">Cuenta atrás</div>
             <div class="countdown" id="admin-countdown">
@@ -319,6 +354,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
           <button class="logs-filter-btn active" data-filter="all">Todos</button>
           <button class="logs-filter-btn" data-filter="login">Accesos usuario</button>
           <button class="logs-filter-btn" data-filter="admin">Accesos admin</button>
+          <button class="logs-filter-btn" data-filter="answer">Respuestas</button>
           <button class="logs-filter-btn" data-filter="failed">Fallidos</button>
         </div>
         <button class="btn btn-sm btn-ghost" onclick="refreshLogs()">&#128260; Actualizar</button>
@@ -383,7 +419,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <script>
 var GITHUB_API = "https://api.github.com/repos/AndresRomero2001/puerta-al-cielo/contents/data.json";
 var ADMIN_HASH = "d8e02dc389f474320bf6ca93f9ae00fce62e319a52b29e7de04cb0658dda168d";
-var ENC_ADMIN_TOKEN = "96d83bb2e95aaef5dbfca525e3c0bf2a:a98064e3272289c0ae9fd770:ef07094f0ef7ad7de53a8ac2d7e3977d:0c9ab100cd8bed9a1c308117aeca9b6801f93fa5cf93b39b324627246266029fbdd08cb8727fca57";
+var ENC_ADMIN_TOKEN = "4a7e59265b0d28aaaaf1669828b881a1:8b80c2fb40cd1501c72d339d:0c8d6969dd2d9002f5d1f6e41ec8cf83:8aa872bde88c5b540ae4aa6b70e7bebd794d55acbc04da060705ae89932e6af2bcdfee849ada2835";
 
 var data = null;
 var isAdmin = false;
@@ -703,7 +739,42 @@ function startCountdown(prefix){
 }
 function renderUser(){
   applyCoords("user");
+  applyReserva("user");
   startCountdown("user");
+}
+
+// ── Reserva (RSVP) ──────────────────────────────────────────────────
+function reservaDoneMsg(ans){
+  return ans === "si"
+    ? "&#127881; &iexcl;Reservados! Nos vemos el 20 y 21. &#129293;"
+    : "Entendido. &#129293;";
+}
+function applyReserva(prefix){
+  var btns = document.getElementById(prefix+"-reserva-btns");
+  var done = document.getElementById(prefix+"-reserva-done");
+  if(!btns || !done) return;
+  var ans = data && data.reservaAnswer;
+  if(ans === "si" || ans === "no"){
+    btns.classList.add("hidden");
+    done.innerHTML = reservaDoneMsg(ans);
+    done.classList.remove("hidden");
+  } else {
+    btns.classList.remove("hidden");
+    done.classList.add("hidden");
+    done.innerHTML = "";
+  }
+}
+function answerReserva(prefix, ans){
+  var btns = document.getElementById(prefix+"-reserva-btns");
+  var done = document.getElementById(prefix+"-reserva-done");
+  if(btns){ btns.classList.add("hidden"); }
+  if(done){ done.innerHTML = reservaDoneMsg(ans); done.classList.remove("hidden"); }
+  // From the admin preview this is just a visual try-out — never persist or log.
+  if(isAdmin) return;
+  data.reservaAnswer = ans;
+  data.reservaAnsweredAt = madridTimestamp();
+  // appendLog() also calls saveData(data), so reservaAnswer is persisted too.
+  appendLog("answer", ans === "si" ? "Reserva 20-21: SÍ" : "Reserva 20-21: NO");
 }
 
 // ── Admin rendering ─────────────────────────────────────────────────
@@ -716,6 +787,7 @@ function renderAdmin(){
   document.getElementById("zero-message-input").value = data.zeroMessage || "";
   document.getElementById("page-disabled-toggle").checked = !!data.pageDisabled;
   applyCoords("admin");
+  applyReserva("admin");
   startCountdown("admin");
   renderLogs();
 }
@@ -771,6 +843,7 @@ function renderLogs(){
     logs = logs.filter(function(l){
       if(activeLogFilter === "login") return l.type === "login" && l.role !== "admin";
       if(activeLogFilter === "admin") return l.type === "login" && l.role === "admin";
+      if(activeLogFilter === "answer") return l.type === "answer";
       if(activeLogFilter === "failed") return l.type === "failed";
       return true;
     });
@@ -783,6 +856,7 @@ function renderLogs(){
   var rows = logs.map(function(l){
     var chipClass, chipLabel;
     if(l.type === "failed"){ chipClass = "failed"; chipLabel = "FALLIDO"; }
+    else if(l.type === "answer"){ chipClass = "answer"; chipLabel = "RESPUESTA"; }
     else if(l.type === "login" && l.role === "admin"){ chipClass = "admin"; chipLabel = "ADMIN"; }
     else if(l.type === "login"){ chipClass = "login"; chipLabel = "ACCESO"; }
     else { chipClass = "login"; chipLabel = (l.type||"").toUpperCase(); }
@@ -832,7 +906,7 @@ document.addEventListener("click", function(e){
   var panel = document.getElementById("panel-"+name);
   if(panel) panel.classList.remove("hidden");
   if(name==="logs") refreshLogs();
-  if(name==="preview"){ applyCoords("admin"); startCountdown("admin"); }
+  if(name==="preview"){ applyCoords("admin"); applyReserva("admin"); startCountdown("admin"); }
 });
 
 // ── Logout ──────────────────────────────────────────────────────────

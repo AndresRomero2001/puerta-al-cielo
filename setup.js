@@ -94,6 +94,8 @@ if (fs.existsSync(dataPath) && !process.argv.includes("--force-data")) {
     longitude: DEFAULT_LONGITUDE,
     countdownTarget: DEFAULT_COUNTDOWN_TARGET,
     zeroMessage: DEFAULT_ZERO_MESSAGE,
+    reservaAnswer: "",
+    reservaAnsweredAt: "",
     pageDisabled: false,
     gateTitle: DEFAULT_GATE_TITLE,
     gateSub: DEFAULT_GATE_SUB,
