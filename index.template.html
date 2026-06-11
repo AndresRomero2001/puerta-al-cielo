@@ -176,13 +176,16 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 }
 .reserva-btns{display:flex;gap:12px;justify-content:center}
 .reserva-btns .btn{width:auto;min-width:118px;padding:12px 30px}
-.reserva-done{
-  font-family:'EB Garamond','Cormorant Garamond',Georgia,serif;
-  font-size:1.18rem;line-height:1.45;color:#e8f3fb;
-  padding:13px 20px;border-radius:16px;display:inline-block;
-  background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(109,40,217,.16));
-  border:1px solid rgba(139,92,246,.4);animation:fadeIn .5s ease;
+.reserva-btn{transition:transform .15s,box-shadow .3s,background .2s,border-color .2s,color .2s}
+.reserva-btn.selected{
+  background:linear-gradient(135deg,var(--accent),var(--accent-d))!important;
+  border-color:transparent!important;color:#fff!important;
+  box-shadow:0 4px 20px rgba(139,92,246,.45);
 }
+.reserva-note{margin-top:14px;font-size:.8rem;color:var(--muted);font-style:italic;line-height:1.45}
+.reserva-status{display:block;margin-top:8px;font-size:.78rem;min-height:16px;color:var(--muted)}
+.reserva-status.ok{color:var(--ok)}
+.reserva-status.err{color:var(--err)}
 
 .countdown-wrap{margin-top:30px}
 .countdown-caption{
@@ -274,10 +277,11 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
     <div class="reserva">
       <p class="reserva-q">¿Quieres reservarte los días 20 y 21?</p>
       <div class="reserva-btns" id="user-reserva-btns">
-        <button class="btn" onclick="answerReserva('user','si')">Sí</button>
-        <button class="btn btn-ghost" onclick="answerReserva('user','no')">No</button>
+        <button class="btn btn-ghost reserva-btn" data-ans="si" onclick="answerReserva('user','si')">Sí</button>
+        <button class="btn btn-ghost reserva-btn" data-ans="no" onclick="answerReserva('user','no')">No</button>
       </div>
-      <div class="reserva-done hidden" id="user-reserva-done"></div>
+      <p class="reserva-note">Por favor, si has cambiado de opinión, avísame cuanto antes.</p>
+      <span class="reserva-status" id="user-reserva-status"></span>
     </div>
 
     <div class="countdown-wrap">
@@ -327,10 +331,11 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
           <div class="reserva">
             <p class="reserva-q">¿Quieres reservarte los días 20 y 21?</p>
             <div class="reserva-btns" id="admin-reserva-btns">
-              <button class="btn" onclick="answerReserva('admin','si')">Sí</button>
-              <button class="btn btn-ghost" onclick="answerReserva('admin','no')">No</button>
+              <button class="btn btn-ghost reserva-btn" data-ans="si" onclick="answerReserva('admin','si')">Sí</button>
+              <button class="btn btn-ghost reserva-btn" data-ans="no" onclick="answerReserva('admin','no')">No</button>
             </div>
-            <div class="reserva-done hidden" id="admin-reserva-done"></div>
+            <p class="reserva-note">Por favor, si has cambiado de opinión, avísame cuanto antes.</p>
+            <span class="reserva-status" id="admin-reserva-status"></span>
           </div>
           <div class="countdown-wrap">
             <div class="countdown-caption">Cuenta atrás</div>
@@ -744,37 +749,47 @@ function renderUser(){
 }
 
 // ── Reserva (RSVP) ──────────────────────────────────────────────────
-function reservaDoneMsg(ans){
-  return ans === "si"
-    ? "&#127881; &iexcl;Reservados! Nos vemos el 20 y 21. &#129293;"
-    : "Entendido. &#129293;";
-}
-function applyReserva(prefix){
-  var btns = document.getElementById(prefix+"-reserva-btns");
-  var done = document.getElementById(prefix+"-reserva-done");
-  if(!btns || !done) return;
-  var ans = data && data.reservaAnswer;
-  if(ans === "si" || ans === "no"){
-    btns.classList.add("hidden");
-    done.innerHTML = reservaDoneMsg(ans);
-    done.classList.remove("hidden");
-  } else {
-    btns.classList.remove("hidden");
-    done.classList.add("hidden");
-    done.innerHTML = "";
+// Both buttons stay visible; the chosen one is highlighted in purple. The
+// choice is persisted to data.reservaAnswer so it's remembered on the next
+// login (from any device), and each answer is written to the logs.
+function highlightReserva(prefix, ans){
+  var wrap = document.getElementById(prefix+"-reserva-btns");
+  if(!wrap) return;
+  var btns = wrap.querySelectorAll(".reserva-btn");
+  for(var i=0;i<btns.length;i++){
+    btns[i].classList.toggle("selected", btns[i].getAttribute("data-ans") === ans);
   }
 }
+function applyReserva(prefix){
+  highlightReserva(prefix, data && data.reservaAnswer);
+}
 function answerReserva(prefix, ans){
-  var btns = document.getElementById(prefix+"-reserva-btns");
-  var done = document.getElementById(prefix+"-reserva-done");
-  if(btns){ btns.classList.add("hidden"); }
-  if(done){ done.innerHTML = reservaDoneMsg(ans); done.classList.remove("hidden"); }
-  // From the admin preview this is just a visual try-out — never persist or log.
+  // Mark the chosen button immediately (keep both buttons on screen).
+  highlightReserva(prefix, ans);
+  // From the admin preview this is a visual try-out only — never persist/log.
   if(isAdmin) return;
+  if(!data) return;
   data.reservaAnswer = ans;
   data.reservaAnsweredAt = madridTimestamp();
-  // appendLog() also calls saveData(data), so reservaAnswer is persisted too.
-  appendLog("answer", ans === "si" ? "Reserva 20-21: SÍ" : "Reserva 20-21: NO");
+  var st = document.getElementById(prefix+"-reserva-status");
+  if(st){ st.className = "reserva-status"; st.textContent = "Guardando…"; }
+  if(!data.logs) data.logs = [];
+  getIP().then(function(ip){
+    data.logs.push({
+      ts: madridTimestamp(), tsISO: new Date().toISOString(), type: "answer",
+      detail: ans === "si" ? "Reserva 20-21: SÍ" : "Reserva 20-21: NO",
+      role: "user", ip: ip, fp: getFingerprint()
+    });
+    if(data.logs.length > 500) data.logs = data.logs.slice(-500);
+    return saveData(data);
+  }).then(function(res){
+    if(!st) return;
+    if(res && res.content){ st.textContent = "Guardado"; st.classList.add("ok"); }
+    else { st.textContent = "No se pudo guardar, reinténtalo"; st.classList.add("err"); }
+    setTimeout(function(){ if(st){ st.textContent=""; st.className="reserva-status"; } }, 3000);
+  }).catch(function(){
+    if(st){ st.textContent = "No se pudo guardar, reinténtalo"; st.classList.add("err"); }
+  });
 }
 
 // ── Admin rendering ─────────────────────────────────────────────────
