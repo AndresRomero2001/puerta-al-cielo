@@ -5,7 +5,7 @@
   "latitude": "",
   "longitude": "",
   "countdownTarget": "2026-06-19T20:00",
-  "zeroMessage": "Paula, ¿me acompañas al cielo?",
+  "zeroMessage": "¿Me acompañas al cielo?",
   "pageDisabled": false,
   "gateTitle": "Puerta al Cielo",
   "gateSub": "Introduce el código de acceso",
@@ -534,5 +534,7 @@
     }
   ],
   "reservaAnswer": "",
-  "reservaAnsweredAt": ""
+  "reservaAnsweredAt": "",
+  "termsText": "<h3>Términos y condiciones</h3><p>Al aceptar, te comprometes a:</p><ul><li>Reservar los días 19 y 20 para esta aventura.</li><li>Venir con muchas ganas.</li><li>Dejarte sorprender.</li></ul><p>Estos términos pueden incluir momentos inolvidables. No se admiten devoluciones.</p>",
+  "termsAccepted": false
 }
