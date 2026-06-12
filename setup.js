@@ -31,7 +31,16 @@ const DEFAULT_LATITUDE = "";
 const DEFAULT_LONGITUDE = "";
 const DEFAULT_COORDS_LABEL = "";
 const DEFAULT_COUNTDOWN_TARGET = ""; // "YYYY-MM-DDTHH:mm" (browser local time)
-const DEFAULT_ZERO_MESSAGE = "Ha llegado el momento.";
+const DEFAULT_ZERO_MESSAGE = "¿Me acompañas al cielo?"; // shown after accepting the terms
+const DEFAULT_TERMS_TEXT =
+  "<h3>Términos y condiciones</h3>" +
+  "<p>Al aceptar, te comprometes a:</p>" +
+  "<ul>" +
+  "<li>Reservar los días 19 y 20 para esta aventura.</li>" +
+  "<li>Venir con muchas ganas.</li>" +
+  "<li>Dejarte sorprender.</li>" +
+  "</ul>" +
+  "<p>Estos términos pueden incluir momentos inolvidables. No se admiten devoluciones.</p>";
 const DEFAULT_GATE_TITLE = "Puerta al Cielo";
 const DEFAULT_GATE_SUB = "Introduce el código de acceso";
 // ────────────────────────────────────────────────────────────────────
@@ -94,6 +103,8 @@ if (fs.existsSync(dataPath) && !process.argv.includes("--force-data")) {
     longitude: DEFAULT_LONGITUDE,
     countdownTarget: DEFAULT_COUNTDOWN_TARGET,
     zeroMessage: DEFAULT_ZERO_MESSAGE,
+    termsText: DEFAULT_TERMS_TEXT,
+    termsAccepted: false,
     reservaAnswer: "",
     reservaAnsweredAt: "",
     pageDisabled: false,
