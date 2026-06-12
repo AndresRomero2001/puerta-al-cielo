@@ -477,6 +477,15 @@
       "role": "user",
       "ip": "85.52.163.192",
       "fp": "eaccbef6"
+    },
+    {
+      "ts": "12/6/2026, 11:11:16",
+      "tsISO": "2026-06-12T09:11:16.682Z",
+      "type": "login",
+      "detail": "admin",
+      "role": "admin",
+      "ip": "85.52.163.192",
+      "fp": "eaccbef6"
     }
   ],
   "reservaAnswer": "",
