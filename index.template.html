@@ -245,6 +245,13 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 }
 @keyframes revealFloat{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-8px) rotate(.6deg)}}
 .shard{position:absolute;background-repeat:no-repeat;will-change:transform,opacity}
+/* When terms are accepted, hide everything except the photo + final message. */
+.sky-card.reveal-mode .coords,
+.sky-card.reveal-mode .coords-label,
+.sky-card.reveal-mode .coords-map,
+.sky-card.reveal-mode .reserva,
+.sky-card.reveal-mode .countdown-caption,
+.sky-card.reveal-mode .countdown{display:none!important}
 
 /* Modal */
 .modal-overlay{
@@ -855,6 +862,13 @@ function parseTarget(){
 function pad2(n){ return String(n).padStart(2,"0"); }
 function hideZeroBlock(prefix){ var z=document.getElementById(prefix+"-zero"); if(z) z.classList.add("hidden"); }
 function showZeroBlock(prefix){ var z=document.getElementById(prefix+"-zero"); if(z) z.classList.remove("hidden"); }
+// In "reveal mode" (terms accepted) we hide the coordinates, the yes/no
+// question and the countdown so the photo + final message have room.
+function setRevealMode(prefix, on){
+  var z = document.getElementById(prefix+"-zero");
+  var card = z ? z.closest(".sky-card") : null;
+  if(card) card.classList.toggle("reveal-mode", !!on);
+}
 function termsAcceptedFor(prefix){
   if(prefix === "admin") return adminPreviewAccepted || !!(data && data.termsAccepted);
   return !!(data && data.termsAccepted);
@@ -867,6 +881,7 @@ function finalMessageText(){
 function applyZeroState(prefix){
   // While the photo reveal/shatter is playing, leave the DOM to startReveal().
   if(revealRunning) return;
+  setRevealMode(prefix, termsAcceptedFor(prefix));
   var intro = document.getElementById(prefix+"-terms-intro");
   var openBtn = document.getElementById(prefix+"-terms-open");
   var reveal = document.getElementById(prefix+"-reveal");
@@ -888,14 +903,18 @@ function applyZeroState(prefix){
 // ── Photo reveal + shatter transition ───────────────────────────────
 function resetRevealUI(prefix){
   var stage = document.getElementById(prefix+"-reveal-stage");
-  if(stage){ var sh = stage.querySelectorAll(".shard"); for(var i=0;i<sh.length;i++) sh[i].remove(); }
+  if(stage){
+    var sh = stage.querySelectorAll(".shard"); for(var i=0;i<sh.length;i++) sh[i].remove();
+    stage.style.width = ""; stage.style.height = "";
+  }
   var img = document.getElementById(prefix+"-reveal-img");
-  if(img){ img.classList.remove("hidden"); img.style.animation = ""; }
+  if(img){ img.classList.remove("hidden"); img.style.visibility = ""; img.style.animation = ""; }
   var reveal = document.getElementById(prefix+"-reveal");
   if(reveal) reveal.classList.add("hidden");
 }
 function startReveal(prefix){
   revealRunning = true;
+  setRevealMode(prefix, true);
   var intro = document.getElementById(prefix+"-terms-intro");
   var openBtn = document.getElementById(prefix+"-terms-open");
   var fin = document.getElementById(prefix+"-final-msg");
@@ -977,7 +996,10 @@ function shatterImage(prefix, cb){
   var cols = 6, rows = 9;
   var cw = w/cols, ch = h/rows;
   var src = img.src;
-  img.classList.add("hidden");
+  // Keep the photo's box in the layout (visibility, not display) so the stage
+  // doesn't collapse and the shards stay within the panel.
+  stage.style.width = w+"px"; stage.style.height = h+"px";
+  img.style.visibility = "hidden";
   var cx = w/2, cy = h/2;
   var frags = [], maxEnd = 0;
   for(var r=0;r<rows;r++){
@@ -990,20 +1012,22 @@ function shatterImage(prefix, cb){
       f.style.backgroundSize = w+"px "+h+"px";
       f.style.backgroundPosition = (-c*cw)+"px "+(-r*ch)+"px";
       stage.appendChild(f);
-      // direction outward from the centre + gravity downward
+      // Tight in-place burst: fragments push outward from the centre a short
+      // distance, shrink and fade quickly so they break apart on the spot
+      // instead of sliding down and out of the panel.
       var fx = (c*cw + cw/2) - cx, fy = (r*ch + ch/2) - cy;
       var dist = Math.sqrt(fx*fx + fy*fy) || 1;
-      var spread = 70 + Math.random()*150;
-      var dx = (fx/dist)*spread + (Math.random()-0.5)*70;
-      var dy = (fy/dist)*spread*0.5 + 140 + Math.random()*200;
-      var rot = (Math.random()-0.5)*200;
-      var delay = (r/rows)*220 + Math.random()*130;
-      var dur = 950 + Math.random()*550;
+      var spread = 26 + Math.random()*48;
+      var dx = (fx/dist)*spread + (Math.random()-0.5)*26;
+      var dy = (fy/dist)*spread + 14 + Math.random()*34; // gentle gravity
+      var rot = (Math.random()-0.5)*140;
+      var delay = (r/rows)*120 + Math.random()*90;
+      var dur = 620 + Math.random()*420;
       maxEnd = Math.max(maxEnd, delay+dur);
       f.animate([
-        {transform:"translate(0,0) rotate(0deg)", opacity:1},
-        {transform:"translate("+dx+"px,"+dy+"px) rotate("+rot+"deg)", opacity:0}
-      ], {duration:dur, delay:delay, easing:"cubic-bezier(.25,.46,.45,.94)", fill:"forwards"});
+        {transform:"translate(0,0) rotate(0deg) scale(1)", opacity:1},
+        {transform:"translate("+dx+"px,"+dy+"px) rotate("+rot+"deg) scale(.35)", opacity:0}
+      ], {duration:dur, delay:delay, easing:"cubic-bezier(.2,.5,.3,1)", fill:"forwards"});
     }
   }
   setTimeout(cb, maxEnd + 140);
@@ -1016,6 +1040,7 @@ function renderCountdown(prefix){
   if(target === null && !sim){
     if(grid) grid.classList.add("hidden");
     hideZeroBlock(prefix);
+    if(!revealRunning) setRevealMode(prefix, false);
     if(noTarget) noTarget.classList.remove("hidden");
     setCdValue(prefix, 0, 0, 0, 0);
     return;
@@ -1030,6 +1055,7 @@ function renderCountdown(prefix){
     return;
   }
   hideZeroBlock(prefix);
+  if(!revealRunning) setRevealMode(prefix, false);
   var s = Math.floor(diff/1000);
   var days = Math.floor(s/86400); s -= days*86400;
   var hours = Math.floor(s/3600); s -= hours*3600;
