@@ -220,6 +220,17 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 .terms-open-btn{width:auto;padding:12px 26px}
 .final-message{font-size:1.6rem;text-align:center;font-style:italic}
 
+/* Photo reveal + shatter transition */
+.reveal{margin-top:26px;display:flex;justify-content:center}
+.reveal-stage{position:relative;display:inline-block;line-height:0}
+.reveal-img{
+  display:block;width:240px;max-width:72vw;height:auto;border-radius:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.55);cursor:default;
+  animation:fadeIn .6s ease, revealFloat 4.5s ease-in-out .6s infinite;
+}
+@keyframes revealFloat{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-8px) rotate(.6deg)}}
+.shard{position:absolute;background-repeat:no-repeat;will-change:transform,opacity}
+
 /* Modal */
 .modal-overlay{
   position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
@@ -346,6 +357,11 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
       <div id="user-zero" class="zero-block hidden">
         <p class="terms-intro" id="user-terms-intro">Debes leer y aceptar los términos y condiciones para poder continuar.</p>
         <button class="btn terms-open-btn" id="user-terms-open" onclick="openTerms('user')">Términos y condiciones</button>
+        <div id="user-reveal" class="reveal hidden">
+          <div class="reveal-stage" id="user-reveal-stage">
+            <img class="reveal-img" id="user-reveal-img" src="sticker.png" alt="">
+          </div>
+        </div>
         <div id="user-final-msg" class="zero-message final-message hidden"></div>
       </div>
     </div>
@@ -411,6 +427,11 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
             <div id="admin-zero" class="zero-block hidden">
               <p class="terms-intro" id="admin-terms-intro">Debes leer y aceptar los términos y condiciones para poder continuar.</p>
               <button class="btn terms-open-btn" id="admin-terms-open" onclick="openTerms('admin')">Términos y condiciones</button>
+              <div id="admin-reveal" class="reveal hidden">
+                <div class="reveal-stage" id="admin-reveal-stage">
+                  <img class="reveal-img" id="admin-reveal-img" src="sticker.png" alt="">
+                </div>
+              </div>
               <div id="admin-final-msg" class="zero-message final-message hidden"></div>
             </div>
           </div>
@@ -531,7 +552,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <script>
 var GITHUB_API = "https://api.github.com/repos/AndresRomero2001/puerta-al-cielo/contents/data.json";
 var ADMIN_HASH = "d8e02dc389f474320bf6ca93f9ae00fce62e319a52b29e7de04cb0658dda168d";
-var ENC_ADMIN_TOKEN = "207d1867d43d845b8fb0708c5f5d66a2:37dd5aededceb2027cf0c58b:7bc66445b212d8e219d5f5aa60dd1b6c:2a36ca85d1cc030da96e09c3d3422f90470f42acf6244ca02af9e5dd6d58280bcdea5d159740ba4a";
+var ENC_ADMIN_TOKEN = "42bd3e27b12fa5c1b3604b233f4ef618:56a02ce6c6dc4be3f5b4f8f4:0b2ca8e2b1c0c8d12670b4936236987d:2e8c6126f85c9c7fe52de5f99e85817f7977e2beca7d6763ac5f2a3c522050044390200e1495580b";
 
 var data = null;
 var isAdmin = false;
@@ -541,6 +562,7 @@ var countdownTimer = null;
 var adminSimZero = false;        // admin preview: simulate the countdown having ended
 var adminPreviewAccepted = false; // admin preview: terms accepted locally (not persisted)
 var currentTermsPrefix = null;    // which view ("user"/"admin") opened the terms modal
+var revealRunning = false;        // photo reveal + shatter transition in progress
 
 // ── Crypto helpers (browser) ────────────────────────────────────────
 function sha256(str){
@@ -815,19 +837,109 @@ function termsAcceptedFor(prefix){
 }
 // Decide what the zero-state shows: the terms gate (must accept) or, once
 // accepted, the final message ("¿Me acompañas al cielo?").
+function finalMessageText(){
+  return (data && data.zeroMessage || "").trim() || "¿Me acompañas al cielo?";
+}
 function applyZeroState(prefix){
+  // While the photo reveal/shatter is playing, leave the DOM to startReveal().
+  if(revealRunning) return;
   var intro = document.getElementById(prefix+"-terms-intro");
   var openBtn = document.getElementById(prefix+"-terms-open");
+  var reveal = document.getElementById(prefix+"-reveal");
   var fin = document.getElementById(prefix+"-final-msg");
   if(termsAcceptedFor(prefix)){
+    // Accepted (persisted or in this session) and not mid-reveal → final message.
     if(intro) intro.classList.add("hidden");
     if(openBtn) openBtn.classList.add("hidden");
-    if(fin){ fin.textContent = (data && data.zeroMessage || "").trim() || "¿Me acompañas al cielo?"; fin.classList.remove("hidden"); }
+    if(reveal) reveal.classList.add("hidden");
+    if(fin){ fin.textContent = finalMessageText(); fin.classList.remove("hidden"); }
   } else {
     if(intro) intro.classList.remove("hidden");
     if(openBtn) openBtn.classList.remove("hidden");
+    if(reveal) reveal.classList.add("hidden");
     if(fin) fin.classList.add("hidden");
   }
+}
+
+// ── Photo reveal + shatter transition ───────────────────────────────
+function resetRevealUI(prefix){
+  var stage = document.getElementById(prefix+"-reveal-stage");
+  if(stage){ var sh = stage.querySelectorAll(".shard"); for(var i=0;i<sh.length;i++) sh[i].remove(); }
+  var img = document.getElementById(prefix+"-reveal-img");
+  if(img){ img.classList.remove("hidden"); img.style.animation = ""; }
+  var reveal = document.getElementById(prefix+"-reveal");
+  if(reveal) reveal.classList.add("hidden");
+}
+function startReveal(prefix){
+  revealRunning = true;
+  var intro = document.getElementById(prefix+"-terms-intro");
+  var openBtn = document.getElementById(prefix+"-terms-open");
+  var fin = document.getElementById(prefix+"-final-msg");
+  if(intro) intro.classList.add("hidden");
+  if(openBtn) openBtn.classList.add("hidden");
+  if(fin) fin.classList.add("hidden");
+  resetRevealUI(prefix);
+  var reveal = document.getElementById(prefix+"-reveal");
+  var img = document.getElementById(prefix+"-reveal-img");
+  if(reveal) reveal.classList.remove("hidden");
+  // The user sees the photo for 20 s; the admin preview is shortened (and
+  // clickable) so the flow can be tested without waiting.
+  var ms = isAdmin ? 6000 : 20000;
+  var fired = false;
+  function go(){ if(fired) return; fired = true; clearTimeout(timer); shatterImage(prefix, function(){ finishReveal(prefix); }); }
+  var timer = setTimeout(go, ms);
+  if(img){
+    img.style.cursor = isAdmin ? "pointer" : "default";
+    img.onclick = isAdmin ? go : null;
+  }
+}
+function finishReveal(prefix){
+  revealRunning = false;
+  var reveal = document.getElementById(prefix+"-reveal");
+  if(reveal) reveal.classList.add("hidden");
+  var fin = document.getElementById(prefix+"-final-msg");
+  if(fin){ fin.textContent = finalMessageText(); fin.classList.remove("hidden"); }
+}
+function shatterImage(prefix, cb){
+  var stage = document.getElementById(prefix+"-reveal-stage");
+  var img = document.getElementById(prefix+"-reveal-img");
+  if(!stage || !img){ cb(); return; }
+  img.style.animation = "none"; // stop floating so shards line up
+  var w = img.clientWidth, h = img.clientHeight;
+  if(!w || !h){ cb(); return; }
+  var cols = 6, rows = 9;
+  var cw = w/cols, ch = h/rows;
+  var src = img.src;
+  img.classList.add("hidden");
+  var cx = w/2, cy = h/2;
+  var frags = [], maxEnd = 0;
+  for(var r=0;r<rows;r++){
+    for(var c=0;c<cols;c++){
+      var f = document.createElement("div");
+      f.className = "shard";
+      f.style.width = cw+"px"; f.style.height = ch+"px";
+      f.style.left = (c*cw)+"px"; f.style.top = (r*ch)+"px";
+      f.style.backgroundImage = 'url("'+src+'")';
+      f.style.backgroundSize = w+"px "+h+"px";
+      f.style.backgroundPosition = (-c*cw)+"px "+(-r*ch)+"px";
+      stage.appendChild(f);
+      // direction outward from the centre + gravity downward
+      var fx = (c*cw + cw/2) - cx, fy = (r*ch + ch/2) - cy;
+      var dist = Math.sqrt(fx*fx + fy*fy) || 1;
+      var spread = 70 + Math.random()*150;
+      var dx = (fx/dist)*spread + (Math.random()-0.5)*70;
+      var dy = (fy/dist)*spread*0.5 + 140 + Math.random()*200;
+      var rot = (Math.random()-0.5)*200;
+      var delay = (r/rows)*220 + Math.random()*130;
+      var dur = 950 + Math.random()*550;
+      maxEnd = Math.max(maxEnd, delay+dur);
+      f.animate([
+        {transform:"translate(0,0) rotate(0deg)", opacity:1},
+        {transform:"translate("+dx+"px,"+dy+"px) rotate("+rot+"deg)", opacity:0}
+      ], {duration:dur, delay:delay, easing:"cubic-bezier(.25,.46,.45,.94)", fill:"forwards"});
+    }
+  }
+  setTimeout(cb, maxEnd + 140);
 }
 function renderCountdown(prefix){
   var target = parseTarget();
@@ -874,13 +986,13 @@ function acceptTerms(){
   var prefix = currentTermsPrefix || "user";
   closeTerms();
   if(isAdmin){
-    // Admin preview: reveal the final message locally, never persist/log.
+    // Admin preview: play the reveal locally, never persist/log.
     adminPreviewAccepted = true;
-    applyZeroState("admin");
+    startReveal("admin");
     return;
   }
   data.termsAccepted = true;
-  applyZeroState("user");
+  startReveal("user");
   if(!data.logs) data.logs = [];
   getIP().then(function(ip){
     data.logs.push({
@@ -1009,6 +1121,8 @@ function renderAdmin(){
   // Reset preview simulation each time the admin opens the panel.
   adminSimZero = false;
   adminPreviewAccepted = false;
+  revealRunning = false;
+  resetRevealUI("admin");
   var sim = document.getElementById("admin-sim-zero");
   if(sim) sim.checked = false;
   applyCoords("admin");
@@ -1163,6 +1277,8 @@ document.getElementById("terms-check").addEventListener("change", function(){
 document.getElementById("admin-sim-zero").addEventListener("change", function(){
   adminSimZero = this.checked;
   adminPreviewAccepted = false; // re-test from scratch each toggle
+  revealRunning = false;
+  resetRevealUI("admin");
   startCountdown("admin");
 });
 </script>
