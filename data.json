@@ -756,31 +756,31 @@
   "phrases": [
     {
       "text": "~ Puerta al cielo ~",
-      "secs": 4
-    },
-    {
-      "text": "Todo pasa por una puerta.",
-      "secs": 4
-    },
-    {
-      "text": "Naces a través de una",
-      "secs": 4
-    },
-    {
-      "text": "Encuentras tu hogar detrás de una",
       "secs": 6
     },
     {
-      "text": "No abrazas a quienes quieres si no has pasado por una",
+      "text": "Todo pasa por una puerta.",
+      "secs": 5
+    },
+    {
+      "text": "Naces a través de una",
+      "secs": 5
+    },
+    {
+      "text": "Encuentras tu hogar detrás de una",
       "secs": 7
+    },
+    {
+      "text": "No abrazas a quienes quieres si no has pasado por una",
+      "secs": 9
     },
     {
       "text": "Da igual la situación, que hará poco que habrás pasado por una",
-      "secs": 7
+      "secs": 9
     },
     {
       "text": "Todo acaba cuando es la hora de traspasar aquella custodiada por un guardián",
-      "secs": 8
+      "secs": 10
     }
   ]
 }
