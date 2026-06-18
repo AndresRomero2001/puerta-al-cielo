@@ -105,6 +105,10 @@ if (fs.existsSync(dataPath) && !process.argv.includes("--force-data")) {
     zeroMessage: DEFAULT_ZERO_MESSAGE,
     termsText: DEFAULT_TERMS_TEXT,
     termsAccepted: false,
+    phrases: [
+      { text: "Gracias por llegar hasta aquí.", secs: 3 },
+      { text: "Esto es para ti.", secs: 3 }
+    ],
     reservaAnswer: "",
     reservaAnsweredAt: "",
     pageDisabled: false,

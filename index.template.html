@@ -231,6 +231,25 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
   0%,100%{box-shadow:0 0 0 1px rgba(139,92,246,.4),0 0 18px rgba(139,92,246,.18)}
   50%{box-shadow:0 0 0 1px rgba(167,139,250,.7),0 0 34px rgba(167,139,250,.5)}
 }
+/* Intermediate phrases (between the shatter and the final message) */
+.phrase-line{
+  margin-top:26px;min-height:2.4em;display:flex;align-items:center;justify-content:center;
+  font-family:'EB Garamond','Cormorant Garamond',Georgia,serif;
+  font-size:1.5rem;line-height:1.45;color:#efeaff;text-align:center;
+  text-shadow:0 1px 12px rgba(139,92,246,.3);
+}
+/* Phrase editor rows (admin) */
+.phrase-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.phrase-row input{margin-bottom:0;letter-spacing:0}
+.phrase-row .phrase-text{flex:1;text-align:left}
+.phrase-row .phrase-secs{width:78px;text-align:center}
+.phrase-row .secs-label{font-size:.8rem;color:var(--muted)}
+.phrase-row .phrase-del{
+  width:38px;height:38px;flex-shrink:0;border:1px solid rgba(248,113,113,.3);
+  background:rgba(248,113,113,.14);color:#fca5a5;border-radius:10px;cursor:pointer;font-size:.95rem;
+}
+.phrase-row .phrase-del:hover{background:rgba(248,113,113,.26)}
+
 /* Fireworks / sparkles layer (when the final phrase appears) */
 .fx-layer{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
 .fx-spark{position:fixed;width:9px;height:9px;border-radius:50%;will-change:transform,opacity}
@@ -384,6 +403,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
             <img class="reveal-img" id="user-reveal-img" src="sticker.png" alt="">
           </div>
         </div>
+        <div id="user-phrase" class="phrase-line hidden"></div>
         <div id="user-final-msg" class="zero-message final-message hidden"></div>
       </div>
     </div>
@@ -406,6 +426,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
       <button class="tab" data-tab="logs">Logs</button>
       <button class="tab" data-tab="settings">Configuración</button>
       <button class="tab" data-tab="terms">Términos</button>
+      <button class="tab" data-tab="frases">Frases</button>
     </div>
 
     <!-- Panel: preview (what the user sees) -->
@@ -454,6 +475,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
                   <img class="reveal-img" id="admin-reveal-img" src="sticker.png" alt="">
                 </div>
               </div>
+              <div id="admin-phrase" class="phrase-line hidden"></div>
               <div id="admin-final-msg" class="zero-message final-message hidden"></div>
             </div>
           </div>
@@ -564,6 +586,19 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
       </div>
     </div>
 
+    <!-- Panel: phrases editor -->
+    <div id="panel-frases" class="panel hidden">
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Frases que aparecen una a una tras romperse la foto, antes del mensaje final. Indica cuántos segundos se muestra cada una. Se reproducen en este orden.</p>
+      <div id="phrases-list"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn btn-sm btn-ghost" onclick="addPhraseRow('', 3)">+ Añadir frase</button>
+      </div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="savePhrases()">Guardar frases</button>
+        <span id="phrases-status" class="status"></span>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -594,6 +629,7 @@ var adminSimZero = false;        // admin preview: simulate the countdown having
 var adminPreviewAccepted = false; // admin preview: terms accepted locally (not persisted)
 var currentTermsPrefix = null;    // which view ("user"/"admin") opened the terms modal
 var revealRunning = false;        // photo reveal + shatter transition in progress
+var revealToken = 0;              // bumped to cancel an in-flight reveal/phrase sequence
 
 // ── Crypto helpers (browser) ────────────────────────────────────────
 function sha256(str){
@@ -902,6 +938,7 @@ function applyZeroState(prefix){
 
 // ── Photo reveal + shatter transition ───────────────────────────────
 function resetRevealUI(prefix){
+  revealToken++; // cancel any in-flight phrase sequence
   var stage = document.getElementById(prefix+"-reveal-stage");
   if(stage){
     var sh = stage.querySelectorAll(".shard"); for(var i=0;i<sh.length;i++) sh[i].remove();
@@ -911,6 +948,8 @@ function resetRevealUI(prefix){
   if(img){ img.classList.remove("hidden"); img.style.visibility = ""; img.style.animation = ""; }
   var reveal = document.getElementById(prefix+"-reveal");
   if(reveal) reveal.classList.add("hidden");
+  var phrase = document.getElementById(prefix+"-phrase");
+  if(phrase){ phrase.classList.add("hidden"); phrase.textContent = ""; }
 }
 function startReveal(prefix){
   revealRunning = true;
@@ -921,7 +960,8 @@ function startReveal(prefix){
   if(intro) intro.classList.add("hidden");
   if(openBtn) openBtn.classList.add("hidden");
   if(fin) fin.classList.add("hidden");
-  resetRevealUI(prefix);
+  resetRevealUI(prefix); // bumps revealToken (cancels any previous run)
+  var myToken = revealToken; // capture AFTER reset so this run stays valid
   var reveal = document.getElementById(prefix+"-reveal");
   var img = document.getElementById(prefix+"-reveal-img");
   if(reveal) reveal.classList.remove("hidden");
@@ -929,7 +969,7 @@ function startReveal(prefix){
   // clickable) so the flow can be tested without waiting.
   var ms = isAdmin ? 6000 : 20000;
   var fired = false;
-  function go(){ if(fired) return; fired = true; clearTimeout(timer); shatterImage(prefix, function(){ finishReveal(prefix); }); }
+  function go(){ if(fired) return; fired = true; clearTimeout(timer); shatterImage(prefix, function(){ if(revealToken!==myToken) return; finishReveal(prefix); }); }
   var timer = setTimeout(go, ms);
   if(img){
     img.style.cursor = isAdmin ? "pointer" : "default";
@@ -937,9 +977,46 @@ function startReveal(prefix){
   }
 }
 function finishReveal(prefix){
-  revealRunning = false;
+  // Shatter done → play the intermediate phrases, then the final message.
   var reveal = document.getElementById(prefix+"-reveal");
   if(reveal) reveal.classList.add("hidden");
+  playPhrases(prefix, function(){ showFinalMessage(prefix); });
+}
+// Show the admin-managed phrases one by one, each for its own duration, with a
+// fade/rise transition between them. Calls done() after the last one.
+function playPhrases(prefix, done){
+  var el = document.getElementById(prefix+"-phrase");
+  var list = ((data && data.phrases) || []).filter(function(p){ return p && (""+(p.text||"")).trim(); });
+  if(!el || !list.length){ done(); return; }
+  var myToken = revealToken;
+  el.classList.remove("hidden");
+  var i = 0;
+  function next(){
+    if(revealToken !== myToken) return; // cancelled by a reset / new run
+    if(i >= list.length){ el.classList.add("hidden"); el.textContent = ""; done(); return; }
+    var p = list[i++];
+    var secs = parseFloat(p.secs); if(isNaN(secs) || secs <= 0) secs = 3;
+    var holdMs = isAdmin ? Math.min(secs*1000, 1300) : secs*1000; // preview is quicker
+    el.textContent = "" + p.text;
+    var ai = el.animate([
+      {opacity:0, transform:"translateY(18px) scale(.95)", filter:"blur(5px)"},
+      {opacity:1, transform:"translateY(0) scale(1)", filter:"blur(0)"}
+    ], {duration:520, easing:"cubic-bezier(.22,1,.36,1)", fill:"forwards"});
+    ai.onfinish = function(){
+      setTimeout(function(){
+        if(revealToken !== myToken) return;
+        var ao = el.animate([
+          {opacity:1, transform:"translateY(0) scale(1)", filter:"blur(0)"},
+          {opacity:0, transform:"translateY(-18px) scale(.97)", filter:"blur(5px)"}
+        ], {duration:440, easing:"cubic-bezier(.4,0,.7,.2)", fill:"forwards"});
+        ao.onfinish = next;
+      }, holdMs);
+    };
+  }
+  next();
+}
+function showFinalMessage(prefix){
+  revealRunning = false;
   var fin = document.getElementById(prefix+"-final-msg");
   if(fin){
     fin.textContent = finalMessageText();
@@ -1108,6 +1185,49 @@ function saveTerms(){
     if(r && r.content) statusOk(st); else statusErr(st, r.message||"Error");
   }).catch(function(){ statusErr(st,"Sin conexión"); });
 }
+
+// ── Phrases editor (admin) ──────────────────────────────────────────
+function addPhraseRow(text, secs){
+  var list = document.getElementById("phrases-list");
+  if(!list) return;
+  var row = document.createElement("div");
+  row.className = "phrase-row";
+  var ti = document.createElement("input");
+  ti.type = "text"; ti.className = "phrase-text"; ti.placeholder = "Frase…"; ti.value = text || "";
+  var si = document.createElement("input");
+  si.type = "number"; si.className = "phrase-secs"; si.min = "1"; si.max = "120"; si.step = "0.5";
+  si.value = (secs == null || isNaN(secs)) ? 3 : secs;
+  var lbl = document.createElement("span"); lbl.className = "secs-label"; lbl.textContent = "s";
+  var del = document.createElement("button");
+  del.type = "button"; del.className = "phrase-del"; del.title = "Quitar"; del.textContent = "✕";
+  del.onclick = function(){ row.remove(); };
+  row.appendChild(ti); row.appendChild(si); row.appendChild(lbl); row.appendChild(del);
+  list.appendChild(row);
+}
+function renderPhrasesEditor(){
+  var list = document.getElementById("phrases-list");
+  if(!list) return;
+  list.innerHTML = "";
+  var arr = (data && data.phrases) || [];
+  for(var i=0;i<arr.length;i++) addPhraseRow(arr[i].text, arr[i].secs);
+}
+function savePhrases(){
+  var st = document.getElementById("phrases-status"); statusLoading(st);
+  var rows = document.querySelectorAll("#phrases-list .phrase-row");
+  var arr = [];
+  rows.forEach(function(r){
+    var t = (r.querySelector(".phrase-text").value || "").trim();
+    if(!t) return; // skip empty
+    var s = parseFloat(r.querySelector(".phrase-secs").value);
+    if(isNaN(s) || s <= 0) s = 3;
+    arr.push({ text: t, secs: s });
+  });
+  data.phrases = arr;
+  saveData(data).then(function(r){
+    if(r && r.content){ statusOk(st); renderPhrasesEditor(); }
+    else statusErr(st, r.message||"Error");
+  }).catch(function(){ statusErr(st,"Sin conexión"); });
+}
 function setCdValue(prefix, d, h, m, s){
   var grid = document.getElementById(prefix+"-countdown");
   if(!grid) return;
@@ -1254,6 +1374,7 @@ function renderAdmin(){
   if(rc) rc.textContent = reservaLabel(data.reservaAnswer);
   var tc = document.getElementById("terms-current");
   if(tc) tc.textContent = termsLabel();
+  renderPhrasesEditor();
   startCountdown("admin");
   renderLogs();
 }
