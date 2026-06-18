@@ -720,6 +720,15 @@
       "role": "admin",
       "ip": "84.78.244.175",
       "fp": "97a23a32"
+    },
+    {
+      "ts": "18/6/2026, 23:30:43",
+      "tsISO": "2026-06-18T21:30:43.237Z",
+      "type": "failed",
+      "detail": "Código incorrecto",
+      "role": "user",
+      "ip": "80.29.227.105",
+      "fp": "a67efcf0"
     }
   ],
   "reservaAnswer": "si",
