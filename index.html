@@ -618,7 +618,7 @@ input:focus{border-color:rgba(139,92,246,.8);box-shadow:0 0 0 4px rgba(139,92,24
 <script>
 var GITHUB_API = "https://api.github.com/repos/AndresRomero2001/puerta-al-cielo/contents/data.json";
 var ADMIN_HASH = "d8e02dc389f474320bf6ca93f9ae00fce62e319a52b29e7de04cb0658dda168d";
-var ENC_ADMIN_TOKEN = "bb26312b0d650e2f23c2f213547fbe84:17f09ce86c1d4147a311f16a:63d8ec49ac704191310e71dd9d7c32fb:3283331ec81f54e7d0e1aeb558d1430e2a67a50292f674114e4c45b6ca7eaf74b369fd37d1d0ddf6";
+var ENC_ADMIN_TOKEN = "c4a028fbadfff4062320c9b89d48b8da:38994825f63f0593c9017c25:d5dbd1876c00ea2aa9566f3530dfc7e9:8a913eeae74bc9fc2bc6fc26c65806ce55cfdd2735abe2d38e09d66109ecd2a8de5cd43802f69bac";
 
 var data = null;
 var isAdmin = false;
@@ -990,30 +990,30 @@ function playPhrases(prefix, done){
   if(!el || !list.length){ done(); return; }
   var myToken = revealToken;
   el.classList.remove("hidden");
+  var IN = 520, OUT = 440;
   var i = 0;
-  function next(){
+  // Progression is driven by setTimeout (robust even if the tab is backgrounded
+  // and the animation clock pauses); the animations are purely visual.
+  function step(){
     if(revealToken !== myToken) return; // cancelled by a reset / new run
     if(i >= list.length){ el.classList.add("hidden"); el.textContent = ""; done(); return; }
     var p = list[i++];
     var secs = parseFloat(p.secs); if(isNaN(secs) || secs <= 0) secs = 3;
-    var holdMs = isAdmin ? Math.min(secs*1000, 1300) : secs*1000; // preview is quicker
     el.textContent = "" + p.text;
-    var ai = el.animate([
+    el.animate([
       {opacity:0, transform:"translateY(18px) scale(.95)", filter:"blur(5px)"},
       {opacity:1, transform:"translateY(0) scale(1)", filter:"blur(0)"}
-    ], {duration:520, easing:"cubic-bezier(.22,1,.36,1)", fill:"forwards"});
-    ai.onfinish = function(){
-      setTimeout(function(){
-        if(revealToken !== myToken) return;
-        var ao = el.animate([
-          {opacity:1, transform:"translateY(0) scale(1)", filter:"blur(0)"},
-          {opacity:0, transform:"translateY(-18px) scale(.97)", filter:"blur(5px)"}
-        ], {duration:440, easing:"cubic-bezier(.4,0,.7,.2)", fill:"forwards"});
-        ao.onfinish = next;
-      }, holdMs);
-    };
+    ], {duration:IN, easing:"cubic-bezier(.22,1,.36,1)", fill:"forwards"});
+    setTimeout(function(){
+      if(revealToken !== myToken) return;
+      el.animate([
+        {opacity:1, transform:"translateY(0) scale(1)", filter:"blur(0)"},
+        {opacity:0, transform:"translateY(-18px) scale(.97)", filter:"blur(5px)"}
+      ], {duration:OUT, easing:"cubic-bezier(.4,0,.7,.2)", fill:"forwards"});
+      setTimeout(step, OUT);
+    }, IN + secs*1000);
   }
-  next();
+  step();
 }
 function showFinalMessage(prefix){
   revealRunning = false;
