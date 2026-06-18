@@ -765,7 +765,7 @@
   "phrases": [
     {
       "text": "~ Puerta al cielo ~",
-      "secs": 6
+      "secs": 5
     },
     {
       "text": "Todo pasa por una puerta.",
@@ -777,11 +777,11 @@
     },
     {
       "text": "Encuentras tu hogar detrás de una",
-      "secs": 7
+      "secs": 5.5
     },
     {
       "text": "No abrazas a quienes quieres si no has pasado por una",
-      "secs": 9
+      "secs": 8.5
     },
     {
       "text": "Da igual la situación, que hará poco que habrás pasado por una",
@@ -789,7 +789,95 @@
     },
     {
       "text": "Todo acaba cuando es la hora de traspasar aquella custodiada por un guardián",
+      "secs": 9.5
+    },
+    {
+      "text": "La vida transcurre entre puerta y puerta",
+      "secs": 6
+    },
+    {
+      "text": "En esos trayectos nos hallamos tú y yo",
+      "secs": 6.5
+    },
+    {
+      "text": "Pero no es un camino marcado,",
+      "secs": 5.5
+    },
+    {
+      "text": "Es un laberinto de puertas en el que estamos perdidos.",
+      "secs": 8
+    },
+    {
+      "text": "Intentamos encontrar el camino adecuado,",
+      "secs": 5
+    },
+    {
+      "text": "pero no siempre lo conseguimos.",
+      "secs": 5
+    },
+    {
+      "text": "Lo seguimos intentando, pero de vez en cuando necesitamos un respiro",
+      "secs": 8.5
+    },
+    {
+      "text": "Es ahí cuando nos paramos y miramos al cielo",
+      "secs": 7
+    },
+    {
+      "text": "Es ahí, en el firmamento, donde yo veía algo que creía inalcanzable.",
+      "secs": 9
+    },
+    {
+      "text": "Pero cuando uno está perdido en la oscuridad,",
+      "secs": 6.5
+    },
+    {
+      "text": "persigue hasta el final la más pequeña de las centellas.",
+      "secs": 8
+    },
+    {
+      "text": "Así que corrí y corrí, me tropecé y me levanté, descansé y continué",
+      "secs": 9.5
+    },
+    {
+      "text": "No me rendí, cada puerta parecía que me acercaba más a aquel lugar",
+      "secs": 9.5
+    },
+    {
+      "text": "Pero era una ilusión,",
+      "secs": 4
+    },
+    {
+      "text": "Daba igual lo cerca que pareciera estar, que no conseguía llegar a mi Destino",
       "secs": 10
+    },
+    {
+      "text": "No obstante, tú, que estabas en tu propio camino, te cruzas en el mío",
+      "secs": 10
+    },
+    {
+      "text": "y juntos nos preguntamos si aquello inalcanzable era en verdad un espejismo,",
+      "secs": 9
+    },
+    {
+      "text": "un déjà vu de aquello que una vez quisimos.",
+      "secs": 7
+    },
+    {
+      "text": "Nos miramos a los ojos, pero ninguno lo sabemos.",
+      "secs": 7
+    },
+    {
+      "text": "Y así, mientras miramos a la última puerta,",
+      "secs": 6.5
+    },
+    {
+      "text": "no paro de pensar en que quiero comprobarlo.",
+      "secs": 6.5
+    },
+    {
+      "text": "Así pues te pregunto...",
+      "secs": 4
     }
   ]
 }
