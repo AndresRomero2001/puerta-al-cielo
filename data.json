@@ -810,6 +810,15 @@
       "role": "admin",
       "ip": "92.59.197.32",
       "fp": "6d03c6c6"
+    },
+    {
+      "ts": "19/6/2026, 20:42:17",
+      "tsISO": "2026-06-19T18:42:17.830Z",
+      "type": "login",
+      "detail": "user",
+      "role": "user",
+      "ip": "176.80.90.193",
+      "fp": "a67efcf0"
     }
   ],
   "reservaAnswer": "si",
