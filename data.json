@@ -783,6 +783,15 @@
       "role": "user",
       "ip": "79.146.41.118",
       "fp": "a67efcf0"
+    },
+    {
+      "ts": "19/6/2026, 18:41:31",
+      "tsISO": "2026-06-19T16:41:31.455Z",
+      "type": "login",
+      "detail": "user",
+      "role": "user",
+      "ip": "79.146.41.118",
+      "fp": "a67efcf0"
     }
   ],
   "reservaAnswer": "si",
