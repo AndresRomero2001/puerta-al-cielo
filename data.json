@@ -4,7 +4,7 @@
   "coordsLabel": "¿Estás preparada?",
   "latitude": "40.42411",
   "longitude": "-3.71040",
-  "countdownTarget": "2026-06-19T20:45",
+  "countdownTarget": "2026-06-19T20:50",
   "zeroMessage": "Paula ¿Me acompañas al cielo?",
   "pageDisabled": false,
   "gateTitle": "Puerta al Cielo",
@@ -810,15 +810,6 @@
       "role": "admin",
       "ip": "92.59.197.32",
       "fp": "6d03c6c6"
-    },
-    {
-      "ts": "19/6/2026, 20:42:17",
-      "tsISO": "2026-06-19T18:42:17.830Z",
-      "type": "login",
-      "detail": "user",
-      "role": "user",
-      "ip": "176.80.90.193",
-      "fp": "a67efcf0"
     }
   ],
   "reservaAnswer": "si",
