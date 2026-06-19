@@ -792,6 +792,15 @@
       "role": "user",
       "ip": "79.146.41.118",
       "fp": "a67efcf0"
+    },
+    {
+      "ts": "19/6/2026, 20:11:33",
+      "tsISO": "2026-06-19T18:11:33.522Z",
+      "type": "failed",
+      "detail": "Código incorrecto",
+      "role": "user",
+      "ip": "92.59.197.32",
+      "fp": "6d03c6c6"
     }
   ],
   "reservaAnswer": "si",
