@@ -4,7 +4,7 @@
   "coordsLabel": "¿Estás preparada?",
   "latitude": "40.42411",
   "longitude": "-3.71040",
-  "countdownTarget": "2026-06-19T20:55",
+  "countdownTarget": "2026-06-19T20:45",
   "zeroMessage": "Paula ¿Me acompañas al cielo?",
   "pageDisabled": false,
   "gateTitle": "Puerta al Cielo",
@@ -810,12 +810,30 @@
       "role": "admin",
       "ip": "92.59.197.32",
       "fp": "6d03c6c6"
+    },
+    {
+      "ts": "19/6/2026, 20:42:17",
+      "tsISO": "2026-06-19T18:42:17.830Z",
+      "type": "login",
+      "detail": "user",
+      "role": "user",
+      "ip": "176.80.90.193",
+      "fp": "a67efcf0"
+    },
+    {
+      "ts": "19/6/2026, 20:51:00",
+      "tsISO": "2026-06-19T18:51:00.586Z",
+      "type": "terms",
+      "detail": "Aceptó los términos y condiciones",
+      "role": "user",
+      "ip": "176.80.90.193",
+      "fp": "a67efcf0"
     }
   ],
   "reservaAnswer": "si",
   "reservaAnsweredAt": "13/6/2026, 18:44:44",
   "termsText": "<h3><span style=\"font-size: 0.95rem;\">Al aceptar, te comprometes a:</span></h3><ul><li>Dejarte ser</li><li>Tener muchas ganas.</li><li>Dejarte sorprender.</li><li>Disfrutar del momento</li><li>Darme tu comida cuando estés llena (sujeto a que me guste lo que ofreces) hoy y todas las veces que coincidamos comiendo</li><li>Hablar y preguntar, para no alimentar al monstruo que queremos dejar atrás</li><li>Y, sobre todo, tienes que aceptar que lo que vas a vivir hoy no es normal. Y con esto me refiero a que seamos conscientes y que no sirva de precedente para absolutamente nada. No sé si te gustará o no, si te sorprenderá o no, pero en el mejor de los casos, queda expresamente prohibido sentir que no se merece, o querer igualar o superar, porque no es la intención. Tómatelo como el fin de una película que queremos dejar atrás para poder continuar con lo que nos queda por llegar.&nbsp;</li></ul><p>Estos términos pueden incluir momentos inolvidables. No se admiten devoluciones.<br><br>P.D: <i>Ojalá</i> te guste, <i>ojalá</i>&nbsp;TBATE</p>",
-  "termsAccepted": false,
+  "termsAccepted": true,
   "phrases": [
     {
       "text": "~ Puerta al cielo ~",
